@@ -1,4 +1,4 @@
-FROM ibisba/rpsbml
+FROM brsynth/rpbase
 
 RUN conda install -y -c rdkit rdkit && \
     mkdir input_cache && \
