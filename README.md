@@ -8,8 +8,9 @@ This is a docker galaxy tools, and thus, the docker needs to be built locally wh
 
 ### Prerequisites
 
-* Docker - [Install](https://docs.docker.com/v17.09/engine/installation/)
-* libSBML - [Anaconda library](https://anaconda.org/SBMLTeam/python-libsbml)
+* [Docker](https://docs.docker.com/v17.09/engine/installation/)
+* [libSBML](http://sbml.org/Software/libSBML)
+* [RPkit](https://www.rdkit.org)
 
 ### Installing
 
