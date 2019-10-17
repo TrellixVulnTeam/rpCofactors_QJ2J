@@ -621,9 +621,10 @@ class rpCofactors:
                 #remove the original species from the monocomponent reaction
                 reactants = set(set(rp_path[stepNum]['left'].keys())-set(ori_rp_path[stepNum]['left'].keys()))
                 products = set(set(rp_path[stepNum]['right'].keys())-set(ori_rp_path[stepNum]['right'].keys()))
+                #print(reactants|products)
                 for species in reactants|products:
                     #check to make sure that they do not yet exist and if not create a new one
-                    if not rpsbml.speciesExists(species):
+                    if not rpsbml.speciesExists(species, compartment_id):
                         xref = {}
                         inchi = None
                         inchikey = None
