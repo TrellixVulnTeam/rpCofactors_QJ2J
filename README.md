@@ -10,7 +10,7 @@ This is a docker galaxy tools, and thus, the docker needs to be built locally wh
 
 * [Docker](https://docs.docker.com/v17.09/engine/installation/)
 * [libSBML](http://sbml.org/Software/libSBML)
-* [RPkit](https://www.rdkit.org)
+* [RDkit](https://www.rdkit.org)
 
 ### Installing
 
