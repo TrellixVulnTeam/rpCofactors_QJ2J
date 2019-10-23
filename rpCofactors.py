@@ -608,10 +608,10 @@ class rpCofactors:
     #  @param self Object pointer
     #  @param rpsbml rpSBML object with a single model
     #  @return Boolean if True then you keep that model for the next step, if not then ignore it
-    def addCofactors(self, rpsbml, compartment_id='MNXC3', pathId='rp_pathway'):
+    def addCofactors(self, rpsbml, compartment_id='MNXC3', path_id='rp_pathway'):
         #This keeps the IDs conversions to the pathway
         pathway_cmp_mnxm = {}
-        rp_path = rpsbml.outPathsDict(pathId)
+        rp_path = rpsbml.outPathsDict(path_id)
         ori_rp_path = copy.deepcopy(rp_path)
         #We reverse the loop to ID the intermediate CMP to their original ones
         for stepNum in sorted(list(rp_path), reverse=True):
