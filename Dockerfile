@@ -1,6 +1,6 @@
-FROM brsynth/rpbase
+FROM brsynth/rpbase:dev
 
-RUN apt-get install --quiet --yes --no-install-recommends \ 
+RUN apt-get install --quiet --yes --no-install-recommends \
 	libxext6  \
     	libxrender-dev  && \
     conda install -y -c rdkit rdkit && \
