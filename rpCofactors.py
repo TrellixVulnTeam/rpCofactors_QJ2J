@@ -554,6 +554,7 @@ class rpCofactors:
     # @param pathway_cmp_mnxm Dictionnary of intermediate compounds with their public ID's
     # @return Boolean determine if the step is to be added
     def addCofactors_step(self, step, pathway_cmp_mnxm):
+        print(step)
         reac_smiles_left = step['reaction_rule'].split('>>')[0]
         reac_smiles_right = step['reaction_rule'].split('>>')[1]
         if self.rr_reactions[step['rule_id']][step['rule_mnxr']]['rel_direction']==-1:
@@ -608,10 +609,10 @@ class rpCofactors:
     #  @param self Object pointer
     #  @param rpsbml rpSBML object with a single model
     #  @return Boolean if True then you keep that model for the next step, if not then ignore it
-    def addCofactors(self, rpsbml, compartment_id='MNXC3', pathId='rp_pathway'):
+    def addCofactors(self, rpsbml, compartment_id='MNXC3', pathway_id='rp_pathway'):
         #This keeps the IDs conversions to the pathway
         pathway_cmp_mnxm = {}
-        rp_path = rpsbml.outPathsDict(pathId)
+        rp_path = rpsbml.outPathsDict(pathway_id)
         ori_rp_path = copy.deepcopy(rp_path)
         #We reverse the loop to ID the intermediate CMP to their original ones
         for stepNum in sorted(list(rp_path), reverse=True):
@@ -621,7 +622,6 @@ class rpCofactors:
                 #remove the original species from the monocomponent reaction
                 reactants = set(set(rp_path[stepNum]['left'].keys())-set(ori_rp_path[stepNum]['left'].keys()))
                 products = set(set(rp_path[stepNum]['right'].keys())-set(ori_rp_path[stepNum]['right'].keys()))
-                #print(reactants|products)
                 for species in reactants|products:
                     #check to make sure that they do not yet exist and if not create a new one
                     if not rpsbml.speciesExists(species, compartment_id):
@@ -666,7 +666,7 @@ class rpCofactors:
                                 pass
                         #add the new species to rpsbml
                         try:
-                            chemName = self.mnxm_strc[species]
+                            chemName = self.mnxm_strc[species]['name']
                         except KeyError:
                             chemName = None
                         rpsbml.createSpecies(species,
