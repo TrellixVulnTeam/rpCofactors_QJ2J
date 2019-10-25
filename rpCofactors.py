@@ -554,6 +554,7 @@ class rpCofactors:
     # @param pathway_cmp_mnxm Dictionnary of intermediate compounds with their public ID's
     # @return Boolean determine if the step is to be added
     def addCofactors_step(self, step, pathway_cmp_mnxm):
+        print(step)
         reac_smiles_left = step['reaction_rule'].split('>>')[0]
         reac_smiles_right = step['reaction_rule'].split('>>')[1]
         if self.rr_reactions[step['rule_id']][step['rule_mnxr']]['rel_direction']==-1:
