@@ -1,9 +1,10 @@
-FROM brsynth/rpbase:dev
+FROM brsynth/rpbase
 
 RUN apt-get install --quiet --yes --no-install-recommends \
 	libxext6  \
     	libxrender-dev  && \
     conda install -y -c rdkit rdkit && \
+    conda install -c conda-forge flask-restful && \
     mkdir input_cache && \
     wget https://www.metanetx.org/cgi-bin/mnxget/mnxref/chem_xref.tsv -P /home/input_cache/ && \
     wget https://www.metanetx.org/cgi-bin/mnxget/mnxref/chem_prop.tsv -P /home/input_cache/ && \
@@ -25,6 +26,11 @@ RUN wget https://retrorules.org/dl/this/is/not/a/secret/path/rr02 -O /home/rr02_
     rm /home/rr02_more_data.tar.gz
 
 COPY rpCofactors.py /home/
+COPY rpCache.py /home/
+COPY rpCofactorsServe.py /home/
 
-#build the cache -- not sure if needed
-RUN python rpCofactors.py
+ENTRYPOINT ["python"]
+CMD ["/home/rpCofactorsServe.py"]
+
+# Open server port
+EXPOSE 8996
