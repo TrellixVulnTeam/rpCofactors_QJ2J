@@ -29,6 +29,8 @@ COPY rpCofactors.py /home/
 COPY rpCache.py /home/
 COPY rpCofactorsServe.py /home/
 
+RUN /home/rpCache.py
+
 ENTRYPOINT ["python"]
 CMD ["/home/rpCofactorsServe.py"]
 

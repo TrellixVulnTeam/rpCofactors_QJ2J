@@ -454,3 +454,7 @@ class rpCache:
                 self.logger.error('Could not read the rules_rall file ('+str(rules_rall_path)+')')
                 return {}
         return rule
+
+
+if __name__ == "__main__":
+    rpcache = rpCache()
