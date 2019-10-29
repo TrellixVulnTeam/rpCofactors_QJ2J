@@ -22,6 +22,7 @@ import glob
 
 sys.path.insert(0, '/home/')
 import rpCofactors
+import rpCache
 import rpSBML
 
 #######################################################
