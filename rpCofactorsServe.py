@@ -19,6 +19,8 @@ import tarfile
 import csv
 import sys
 import glob
+import random
+import string
 
 sys.path.insert(0, '/home/')
 import rpCofactors
@@ -76,8 +78,8 @@ def runSingleSBML(rpcofactors, member_name, rpsbml_string, path_id, compartment_
 #
 def runCofactors_mem(rpcofactors, inputTar, outputTar, path_id='rp_pathway', compartment_id='MNXC3'):
     #loop through all of them and run FBA on them
-    with tarfile.open(outputTar, 'w:xz') as tf:
-        with tarfile.open(inputTar, 'r:xz') as in_tf:
+    with tarfile.open(fileobj=outputTar, mode='w:xz') as tf:
+        with tarfile.open(fileobj=inputTar, mode='r:xz') as in_tf:
             for member in in_tf.getmembers():
                 if not member.name=='':
                     data = singleCofactors(rpcofactors,
@@ -102,7 +104,7 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathId='rp_pathway', comp
     tmpOutputFolder = os.getcwd()+'/tmp/'+''.join(random.choice(string.ascii_lowercase) for i in range(15))
     os.mkdir(tmpInputFolder)
     os.mkdir(tmpOutputFolder)
-    tar = tarfile.open(inputTar, 'r:xz')
+    tar = tarfile.open(fileobj=inputTar, mode='r:xz')
     tar.extractall(path=tmpInputFolder)
     tar.close()
     for sbml_path in glob.glob(tmpInputFolder+'/*'):
@@ -112,7 +114,7 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathId='rp_pathway', comp
         rpcofactors.addCofactors(rpsbml, compartment_id, pathId)
         rpsbml.writeSBML(tmpOutputFolder)
         rpsbml = None
-    with tarfile.open(outputTar, mode='w:xz') as ot:
+    with tarfile.open(fileobj=outputTar, mode='w:xz') as ot:
         for sbml_path in glob.glob(tmpOutputFolder+'/*'):
             fileName = str(sbml_path.split('/')[-1].replace('.sbml', ''))
             info = tarfile.TarInfo(fileName)
