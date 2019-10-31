@@ -64,10 +64,10 @@ class RestApp(Resource):
 ## Run a single 
 #
 #
-def runSingleSBML(rpcofactors, member_name, rpsbml_string, path_id, compartment_id):
+def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartment_id):
     #open one of the rp SBML files
     rpsbml = rpSBML.rpSBML(member_name, libsbml.readSBMLFromString(rpsbml_string))
-    if rpcofactors.addCofactors(rpsbml, compartment_id, path_id):
+    if rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id):
         return libsbml.writeSBMLToString(rpsbml.document).encode('utf-8')
     else:
         return ''
@@ -76,7 +76,7 @@ def runSingleSBML(rpcofactors, member_name, rpsbml_string, path_id, compartment_
 ##
 #
 #
-def runCofactors_mem(rpcofactors, inputTar, outputTar, path_id='rp_pathway', compartment_id='MNXC3'):
+def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
     #loop through all of them and run FBA on them
     with tarfile.open(fileobj=outputTar, mode='w:xz') as tf:
         with tarfile.open(fileobj=inputTar, mode='r:xz') as in_tf:
@@ -85,7 +85,7 @@ def runCofactors_mem(rpcofactors, inputTar, outputTar, path_id='rp_pathway', com
                     data = singleCofactors(rpcofactors,
                             member.name,
                             in_tf.extractfile(member).read().decode('utf-8'),
-                            path_id,
+                            pathway_id,
                             compartment_id)
                     if not data=='':
                         fiOut = io.BytesIO(data)
@@ -97,7 +97,7 @@ def runCofactors_mem(rpcofactors, inputTar, outputTar, path_id='rp_pathway', com
 ## run using HDD 3X less than the above function
 #
 #
-def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathId='rp_pathway', compartment_id='MNXC3'):
+def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
     if not os.path.exists(os.getcwd()+'/tmp'):
         os.mkdir(os.getcwd()+'/tmp')
     tmpInputFolder = os.getcwd()+'/tmp/'+''.join(random.choice(string.ascii_lowercase) for i in range(15))
@@ -111,7 +111,7 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathId='rp_pathway', comp
         fileName = sbml_path.split('/')[-1].replace('.sbml', '')
         rpsbml = rpSBML.rpSBML(fileName)
         rpsbml.readSBML(sbml_path)
-        rpcofactors.addCofactors(rpsbml, compartment_id, pathId)
+        rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id)
         rpsbml.writeSBML(tmpOutputFolder)
         rpsbml = None
     with tarfile.open(fileobj=outputTar, mode='w:xz') as ot:
@@ -143,9 +143,9 @@ class RestQuery(Resource):
         rpcofactors.chemXref = rpcache.chemXref
         rpcofactors.rr_reactions = rpcache.rr_reactions
         ######## HDD #######
-        runCofactors_hdd(rpcofactors, inputTar, outputTar, params['path_id'], params['compartment_id'])
+        runCofactors_hdd(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
         ######## MEM #######
-        #runCofactors_mem(rpcofactors, inputTar, outputTar, params['path_id'], params['compartment_id'])
+        #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
         ###### IMPORTANT ######
         outputTar.seek(0)
         #######################
