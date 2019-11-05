@@ -3,3 +3,4 @@ cache/
 *.swp
 rpSBML.py
 __pycache__/
+tmp/
