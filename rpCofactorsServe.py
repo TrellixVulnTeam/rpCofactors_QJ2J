@@ -8,7 +8,6 @@ Created on September 21 2019
 """
 
 import os
-import shutil
 import json
 import libsbml
 from datetime import datetime
@@ -19,8 +18,7 @@ import tarfile
 import csv
 import sys
 import glob
-import random
-import string
+import tempfile
 
 sys.path.insert(0, '/home/')
 import rpCofactors
@@ -98,30 +96,25 @@ def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
 #
 #
 def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
-    if not os.path.exists(os.getcwd()+'/tmp'):
-        os.mkdir(os.getcwd()+'/tmp')
-    tmpInputFolder = os.getcwd()+'/tmp/'+''.join(random.choice(string.ascii_lowercase) for i in range(15))
-    tmpOutputFolder = os.getcwd()+'/tmp/'+''.join(random.choice(string.ascii_lowercase) for i in range(15))
-    os.mkdir(tmpInputFolder)
-    os.mkdir(tmpOutputFolder)
-    tar = tarfile.open(fileobj=inputTar, mode='r:xz')
-    tar.extractall(path=tmpInputFolder)
-    tar.close()
-    for sbml_path in glob.glob(tmpInputFolder+'/*'):
-        fileName = sbml_path.split('/')[-1].replace('.sbml', '')
-        rpsbml = rpSBML.rpSBML(fileName)
-        rpsbml.readSBML(sbml_path)
-        rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id)
-        rpsbml.writeSBML(tmpOutputFolder)
-        rpsbml = None
-    with tarfile.open(fileobj=outputTar, mode='w:xz') as ot:
-        for sbml_path in glob.glob(tmpOutputFolder+'/*'):
-            fileName = str(sbml_path.split('/')[-1].replace('.sbml', ''))
-            info = tarfile.TarInfo(fileName)
-            info.size = os.path.getsize(sbml_path)
-            ot.addfile(tarinfo=info, fileobj=open(sbml_path, 'rb'))
-    shutil.rmtree(tmpInputFolder)
-    shutil.rmtree(tmpOutputFolder)
+    with tempfile.TemporaryDirectory() as tmpOutputFolder:
+        with tempfile.TemporaryDirectory() as tmpInputFolder:
+            tar = tarfile.open(fileobj=inputTar, mode='r:xz')
+            tar.extractall(path=tmpInputFolder)
+            tar.close()
+            for sbml_path in glob.glob(tmpInputFolder+'/*'):
+                fileName = sbml_path.split('/')[-1].replace('.sbml.xml', '')
+                rpsbml = rpSBML.rpSBML(fileName)
+                rpsbml.readSBML(sbml_path)
+                rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id)
+                rpsbml.writeSBML(tmpOutputFolder)
+                rpsbml = None
+            with tarfile.open(fileobj=outputTar, mode='w:xz') as ot:
+                for sbml_path in glob.glob(tmpOutputFolder+'/*'):
+                    fileName = str(sbml_path.split('/')[-1].replace('.sbml', ''))
+                    fileName += '.sbml.xml'
+                    info = tarfile.TarInfo(fileName)
+                    info.size = os.path.getsize(sbml_path)
+                    ot.addfile(tarinfo=info, fileobj=open(sbml_path, 'rb'))
 
 
 ## REST Query
