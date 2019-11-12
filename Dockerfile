@@ -1,6 +1,6 @@
 FROM brsynth/rpbase
 
-RUN apt-get install --quiet --yes --no-install-recommends \ 
+RUN apt-get install --quiet --yes --no-install-recommends \
 	libxext6  \
     	libxrender-dev  && \
     conda install -y -c rdkit rdkit && \
@@ -28,8 +28,16 @@ RUN wget https://retrorules.org/dl/this/is/not/a/secret/path/rr02 -O /home/rr02_
     rm -r /home/rr02_more_data && \
     rm /home/rr02_more_data.tar.gz
 
+<<<<<<< HEAD
 #build the cache -- not sure if needed
 RUN python rpCofactors.py
+=======
+COPY rpCofactors.py /home/
+COPY rpCache.py /home/
+COPY rpCofactorsServe.py /home/
+
+RUN python /home/rpCache.py
+>>>>>>> master_rest
 
 ENTRYPOINT ["python"]
 CMD ["/home/rpCofactorsServe.py"]

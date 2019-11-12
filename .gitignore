@@ -1,0 +1,6 @@
+input_cache/
+cache/
+*.swp
+rpSBML.py
+__pycache__/
+tmp/
