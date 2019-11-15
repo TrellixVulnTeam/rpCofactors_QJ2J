@@ -10,9 +10,6 @@ RUN apt-get install --quiet --yes --no-install-recommends \
     wget https://www.metanetx.org/cgi-bin/mnxget/mnxref/chem_prop.tsv -P /home/input_cache/ && \
     wget https://www.metanetx.org/cgi-bin/mnxget/mnxref/reac_xref.tsv -P /home/input_cache/
 
-COPY rpCofactors.py /home/
-COPY rpCofactorsServe.py /home/
-
 #get the rules
 RUN wget https://retrorules.org/dl/preparsed/rr02/rp3/hs -O /home/rules_rall_rp3.tar.gz && \
     tar xf /home/rules_rall_rp3.tar.gz -C /home/ && \
@@ -28,16 +25,11 @@ RUN wget https://retrorules.org/dl/this/is/not/a/secret/path/rr02 -O /home/rr02_
     rm -r /home/rr02_more_data && \
     rm /home/rr02_more_data.tar.gz
 
-<<<<<<< HEAD
-#build the cache -- not sure if needed
-RUN python rpCofactors.py
-=======
 COPY rpCofactors.py /home/
 COPY rpCache.py /home/
 COPY rpCofactorsServe.py /home/
 
 RUN python /home/rpCache.py
->>>>>>> master_rest
 
 ENTRYPOINT ["python"]
 CMD ["/home/rpCofactorsServe.py"]
