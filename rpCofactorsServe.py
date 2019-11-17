@@ -31,6 +31,9 @@ import rpSBML
 
 app = Flask(__name__)
 api = Api(app)
+
+rpcache = rpCache.rpCache()
+
 def stamp(data, status=1):
     appinfo = {'app': 'rpCofactors', 'version': '1.0', 
                'author': 'Melchior du Lac',
