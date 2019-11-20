@@ -4,8 +4,6 @@ import csv
 import logging
 import os
 import pickle
-import gzip
-import urllib.request
 import re
 
 
