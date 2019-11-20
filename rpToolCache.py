@@ -5,6 +5,7 @@ import logging
 import os
 import pickle
 import re
+import rpCache
 
 
 
@@ -18,7 +19,7 @@ import re
 #
 # Contains all the functions that parse different files, used to calculate the thermodynamics and the FBA of the
 #the other steps. These should be called only when the files have changes
-class rpCofactorsCache(rpCache):
+class rpToolCache(rpCache):
     ## Cache constructor
     #
     # @param self The object pointer
@@ -116,4 +117,4 @@ class rpCofactorsCache(rpCache):
 
 
 if __name__ == "__main__":
-    rpcache = rpCofactorsCache()
+    rpcache = rpToolCache()

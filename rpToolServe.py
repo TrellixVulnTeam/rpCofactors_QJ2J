@@ -22,7 +22,7 @@ import tempfile
 
 sys.path.insert(0, '/home/')
 import rpTool as rpCofactors
-import rpCache
+import rpToolCache
 import rpSBML
 
 #######################################################
@@ -32,7 +32,7 @@ import rpSBML
 app = Flask(__name__)
 api = Api(app)
 
-rpcache = rpCache.rpCache()
+rpcache = rpToolCache.rpToolCache()
 
 def stamp(data, status=1):
     appinfo = {'app': 'rpCofactors', 'version': '1.0',
