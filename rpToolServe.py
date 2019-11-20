@@ -21,7 +21,7 @@ import glob
 import tempfile
 
 sys.path.insert(0, '/home/')
-import rpCofactors
+import rpTool as rpCofactors
 import rpCache
 import rpSBML
 
@@ -35,10 +35,10 @@ api = Api(app)
 rpcache = rpCache.rpCache()
 
 def stamp(data, status=1):
-    appinfo = {'app': 'rpCofactors', 'version': '1.0', 
+    appinfo = {'app': 'rpCofactors', 'version': '1.0',
                'author': 'Melchior du Lac',
                'organization': 'BRS',
-               'time': datetime.now().isoformat(), 
+               'time': datetime.now().isoformat(),
                'status': status}
     out = appinfo.copy()
     out['data'] = data
@@ -55,7 +55,7 @@ class RestApp(Resource):
         return jsonify(stamp(None))
 
 
-## Run a single 
+## Run a single
 #
 #
 def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartment_id):
