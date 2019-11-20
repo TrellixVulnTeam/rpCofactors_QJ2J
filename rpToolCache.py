@@ -5,7 +5,7 @@ import logging
 import os
 import pickle
 import re
-import rpCache
+from rpCache import rpCache
 
 
 
@@ -37,6 +37,7 @@ class rpToolCache(rpCache):
     # @param The oject pointer
     # @return Boolean detemining the success of the function or not
     def _loadCache(self, fetchInputFiles=False):
+        dirname = os.path.dirname(os.path.abspath( __file__ ))
         if not os.path.isfile(dirname+'/cache/full_reactions.pickle'):
             pickle.dump(self.full_reac(dirname+'/input_cache/rxn_recipes.tsv'),
                     open(dirname+'/cache/full_reactions.pickle', 'wb'))
