@@ -25,9 +25,14 @@ class rpToolCache(rpCache):
     # @param self The object pointer
     # @param inputPath The path to the folder that contains all the input/output files required
     def __init__(self):
+
         super().__init__()
+
         #given by Thomas
         self.full_reactions = None
+
+        if not self._loadCache():
+            raise KeyError
 
 
     ## Private function to fetch the required data, parse them and generate the pickle
