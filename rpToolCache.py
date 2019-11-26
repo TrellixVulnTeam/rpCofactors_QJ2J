@@ -25,9 +25,9 @@ class rpToolCache(rpCache):
     # @param self The object pointer
     # @param inputPath The path to the folder that contains all the input/output files required
     def __init__(self):
+        super().__init__()
         #given by Thomas
         self.full_reactions = None
-        rpCache.__init__(self)
 
 
     ## Private function to fetch the required data, parse them and generate the pickle
@@ -37,7 +37,9 @@ class rpToolCache(rpCache):
     # @param The oject pointer
     # @return Boolean detemining the success of the function or not
     def _loadCache(self, fetchInputFiles=False):
+
         dirname = os.path.dirname(os.path.abspath( __file__ ))
+
         if not os.path.isfile(dirname+'/cache/full_reactions.pickle'):
             pickle.dump(self.full_reac(dirname+'/input_cache/rxn_recipes.tsv'),
                     open(dirname+'/cache/full_reactions.pickle', 'wb'))
