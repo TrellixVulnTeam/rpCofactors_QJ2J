@@ -17,7 +17,7 @@ docker build -t brsynth/rpcofactors .
 Run the service
 
 ```
-docker run -p 8996:8996 brsynth/rpcofactors
+docker run -p 8888:8888 brsynth/rpcofactors
 ```
 
 ## Running the tests
