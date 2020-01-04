@@ -10,49 +10,18 @@ Created on September 21 2019
 import os
 import json
 import libsbml
-from datetime import datetime
-from flask import Flask, request, jsonify, send_file, abort
-from flask_restful import Resource, Api
 import io
 import tarfile
 import csv
 import sys
 import glob
 import tempfile
+import shutil
 
 sys.path.insert(0, '/home/')
 import rpTool as rpCofactors
 import rpToolCache
 import rpSBML
-
-#######################################################
-############## REST ###################################
-#######################################################
-
-app = Flask(__name__)
-api = Api(app)
-
-rpcache = rpToolCache.rpToolCache()
-
-def stamp(data, status=1):
-    appinfo = {'app': 'rpCofactors', 'version': '1.0',
-               'author': 'Melchior du Lac',
-               'organization': 'BRS',
-               'time': datetime.now().isoformat(),
-               'status': status}
-    out = appinfo.copy()
-    out['data'] = data
-    return out
-
-
-## REST App.
-#
-#
-class RestApp(Resource):
-    def post(self):
-        return jsonify(stamp(None))
-    def get(self):
-        return jsonify(stamp(None))
 
 
 ## Run a single
@@ -94,7 +63,7 @@ def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
 def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
     with tempfile.TemporaryDirectory() as tmpOutputFolder:
         with tempfile.TemporaryDirectory() as tmpInputFolder:
-            tar = tarfile.open(fileobj=inputTar, mode='r:xz')
+            tar = tarfile.open(inputTar, mode='r')
             tar.extractall(path=tmpInputFolder)
             tar.close()
             for sbml_path in glob.glob(tmpInputFolder+'/*'):
@@ -113,37 +82,29 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
                     ot.addfile(tarinfo=info, fileobj=open(sbml_path, 'rb'))
 
 
-## REST Query
+##
 #
-# REST interface that generates the Design.
-# Avoid returning numpy or pandas object in
-# order to keep the client lighter.
-class RestQuery(Resource):
-    def post(self):
-        inputTar = request.files['inputTar']
-        params = json.load(request.files['data'])
-        #pass the cache parameters to the rpCofactors object
-        outputTar = io.BytesIO()
-        rpcofactors = rpCofactors.rpCofactors()
-        rpcofactors.deprecatedMNXM_mnxm = rpcache.deprecatedMNXM_mnxm
-        rpcofactors.deprecatedMNXR_mnxr = rpcache.deprecatedMNXR_mnxr
-        rpcofactors.mnxm_strc = rpcache.mnxm_strc
-        rpcofactors.full_reactions = rpcache.full_reactions
-        rpcofactors.chemXref = rpcache.chemXref
-        rpcofactors.rr_reactions = rpcache.rr_reactions
-        ######## HDD #######
-        runCofactors_hdd(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
-        ######## MEM #######
-        #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
-        ###### IMPORTANT ######
-        outputTar.seek(0)
-        #######################
-        return send_file(outputTar, as_attachment=True, attachment_filename='rpCofactors.tar', mimetype='application/x-tar')
-
-
-api.add_resource(RestApp, '/REST')
-api.add_resource(RestQuery, '/REST/Query')
-
-
-if __name__== "__main__":
-    app.run(host="0.0.0.0", port=8888, debug=True, threaded=True)
+#
+def main(inputTar,
+         outputTar,
+         pathway_id,
+         compartment_id):
+    rpcache = rpToolCache.rpToolCache()
+    rpcofactors = rpCofactors.rpCofactors()
+    rpcofactors.deprecatedMNXM_mnxm = rpcache.deprecatedMNXM_mnxm
+    rpcofactors.deprecatedMNXR_mnxr = rpcache.deprecatedMNXR_mnxr
+    rpcofactors.mnxm_strc = rpcache.mnxm_strc
+    rpcofactors.full_reactions = rpcache.full_reactions
+    rpcofactors.chemXref = rpcache.chemXref
+    rpcofactors.rr_reactions = rpcache.rr_reactions
+    #pass the files to the rpReader
+    outputTar_bytes = io.BytesIO()
+    ######## HDD #######
+    runCofactors_hdd(rpcofactors, inputTar, outputTar_bytes, pathway_id, compartment_id)
+    ######## MEM #######
+    #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
+    ########## IMPORTANT #####
+    outputTar_bytes.seek(0)
+    ##########################
+    with open(outputTar, 'wb') as f:
+        shutil.copyfileobj(outputTar_bytes, f, length=131072)
