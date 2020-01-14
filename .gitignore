@@ -5,3 +5,4 @@ rpSBML.py
 __pycache__/
 tmp/
 test/test_output.tar
+test/results/
