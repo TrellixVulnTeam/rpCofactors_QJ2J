@@ -6,3 +6,6 @@ __pycache__/
 tmp/
 test/test_output.tar
 test/results/
+.ipynb_checkpoints/
+*.ipynb
+rpCache.py
