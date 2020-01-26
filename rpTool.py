@@ -84,7 +84,7 @@ class rpCofactors:
             #else:
             #    self.logger.warning('Cannot find '+str(step_spe)+' in pathway_cmp_mnxm')
             #    return False
-        return True
+        return True, rr_string
 
 
     ## Add the cofactors to monocomponent reactions
@@ -95,15 +95,8 @@ class rpCofactors:
     def addCofactors_step(self, step, pathway_cmp_mnxm):
         reac_smiles_left = step['reaction_rule'].split('>>')[0]
         reac_smiles_right = step['reaction_rule'].split('>>')[1]
-        if step['rule_id'] in self.rr_reactions:
-            self.logger.error('Could not recognise '+str(step['rule_id'])+' in self.rr_reactions')
-            return False
-        if step['rule_ori_reac']['mnxr'] in self.rr_reactions[step['rule_id']]:
-            self.logger.error('Could not recognise '+str(step['rule_ori_reac']['mnxr'])+' in self.rr_reactions')
-            return False
-        #rule_ori_reac is now a list of dict
         if self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['rel_direction']==-1:
-            isSuccess = self.completeReac(step['right'],
+            isSuccess, reac_smiles_right = self.completeReac(step['right'],
                     self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['left'],
                     self.full_reactions[step['rule_ori_reac']['mnxr']]['right'],
                     True,
@@ -112,7 +105,7 @@ class rpCofactors:
             if not isSuccess:
                 self.logger.error('Could not recognise reaction rule for step '+str(step))
                 return False
-            isSuccess = self.completeReac(step['left'],
+            isSuccess, reac_smiles_left = self.completeReac(step['left'],
                     self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['right'],
                     self.full_reactions[step['rule_ori_reac']['mnxr']]['left'],
                     False,
@@ -122,7 +115,7 @@ class rpCofactors:
                 self.logger.error('Could not recognise reaction rule for step '+str(step))
                 return False
         elif self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['rel_direction']==1:
-            isSuccess = self.completeReac(step['right'],
+            isSuccess, reac_smiles_right = self.completeReac(step['right'],
                     self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['left'],
                     self.full_reactions[step['rule_ori_reac']['mnxr']]['left'],
                     True,
@@ -131,7 +124,7 @@ class rpCofactors:
             if not isSuccess:
                 self.logger.error('Could not recognise reaction rule for step '+str(step))
                 return False
-            isSuccess = self.completeReac(step['left'],
+            isSuccess, reac_smiles_left = self.completeReac(step['left'],
                     self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['right'],
                     self.full_reactions[step['rule_ori_reac']['mnxr']]['right'],
                     False,
