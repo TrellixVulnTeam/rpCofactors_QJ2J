@@ -11,6 +11,9 @@ import argparse
 import json
 import glob
 import tarfile
+import logging
+import io
+import tempfile
 
 ## Use
 #
@@ -40,9 +43,26 @@ if __name__ == "__main__":
     parser.add_argument('-compartment_id', type=str)
     parser.add_argument('-server_url', type=str)
     parser.add_argument('-outputTar', type=str)
+    parser.add_argument('-sbml', type=str)
     params = parser.parse_args()
-    rpCofactorsUpload(params.inputTar,
-            params.pathway_id,
-            params.compartment_id,
-            params.server_url,
-            params.outputTar)
+    if params.sbml=='None' or params.sbml==None, or params.sbml=='':
+        if params.outputTar=='None' or params.outputTar==None or params.outputTar=='':
+            logging.error('Cannot have no SBML and no TAR input')
+            exit(0)
+        else:
+            rpCofactorsUpload(params.inputTar,
+                              params.pathway_id,
+                              params.compartment_id,
+                              params.server_url,
+                              params.outputTar)
+    else:
+        #make the tar.xz 
+        with tempfile.TemporaryDirectory() as tmpOutputFolder:
+            inputTar = tmpOutputFolder+'/tmp_input.tar.xz'
+            with tarfile.open(inputTar, mode='w:xz') as tf:
+                tf.addfile(params.sbml)
+            rpCofactorsUpload(inputTar,
+                              params.pathway_id,
+                              params.compartment_id,
+                              params.server_url,
+                              params.outputTar)
