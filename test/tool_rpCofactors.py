@@ -19,8 +19,23 @@ if __name__ == "__main__":
     parser.add_argument('-pathway_id', type=str)
     parser.add_argument('-compartment_id', type=str)
     parser.add_argument('-outputTar', type=str)
+    parser.add_argument('-sbml', type=str)
     params = parser.parse_args()
-    rpToolServe.main(params.inputTar,
-                     params.outputTar,
-                     params.pathway_id,
-                     params.compartment_id)
+    if params.sbml=='None' or params.sbml==None, or params.sbml=='':
+        if params.inputTar=='None' or params.inputTar==None or params.inputTar=='':
+            logging.error('Cannot have no SBML and no TAR input')
+            exit(0)
+        rpToolServe.main(params.inputTar,
+                         params.outputTar,
+                         params.pathway_id,
+                         params.compartment_id)
+    else:
+        #make the tar.xz 
+        with tempfile.TemporaryDirectory() as tmpOutputFolder:
+            inputTar = tmpOutputFolder+'/tmp_input.tar.xz'
+            with tarfile.open(inputTar, mode='w:xz') as tf:
+                tf.addfile(params.sbml)
+            rpToolServe.main(inputTar,
+                             params.outputTar,
+                             params.pathway_id,
+                             params.compartment_id)
