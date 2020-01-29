@@ -1,5 +1,4 @@
-#FROM brsynth/rpcache
-FROM brsynth/rpbase
+FROM brsynth/rpcache
 
 COPY rpTool.py /home/
 COPY rpToolServe.py /home/

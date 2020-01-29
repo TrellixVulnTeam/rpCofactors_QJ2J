@@ -6,3 +6,5 @@ __pycache__/
 tmp/
 test/test_output.tar
 test/results/
+test_output.tar
+rpCache.py
