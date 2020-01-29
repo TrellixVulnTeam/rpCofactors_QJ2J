@@ -11,13 +11,13 @@ REST service of rpCofactors. Takes as input a tar.xz of rpSBML files and outputs
 ### Installing
 
 ```
-docker build -t brsynth/rpcofactors .
+docker build -t brsynth/rpcofactors-rest .
 ```
 
 Run the service
 
 ```
-docker run -p 8888:8888 brsynth/rpcofactors
+docker run -p 8888:8888 brsynth/rpcofactors-rest
 ```
 
 ## Running the tests
