@@ -96,7 +96,6 @@ class rpCofactors:
     def addCofactors_step(self, step, pathway_cmp_mnxm):
         reac_smiles_left = step['reaction_rule'].split('>>')[0]
         reac_smiles_right = step['reaction_rule'].split('>>')[1]
-        print(step)
         if self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['rel_direction']==-1:
             isSuccess, reac_smiles_left = self.completeReac(step['right'],
                     self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['left'],
