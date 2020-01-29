@@ -9,6 +9,8 @@ Created on September 21 2019
 import json
 import argparse
 import requests
+import tempfile
+import tarfile
 
 def rpCofactorsUpload(inputTar,
         pathway_id,
@@ -33,10 +35,26 @@ if __name__ == "__main__":
     parser.add_argument('-pathway_id', type=str)
     parser.add_argument('-compartment_id', type=str)
     parser.add_argument('-outputTar', type=str)
+    parser.add_argument('-sbml', type=str)
     parser.add_argument('-server_url', type=str)
     params = parser.parse_args()
-    rpCofactorsUpload(params.inputTar,
-                      params.pathway_id,
-                      params.compartment_id,
-                      params.server_url,
-                      params.outputTar) 
+    if params.sbml=='None' or params.sbml==None or params.sbml=='':
+        if params.inputTar=='None' or params.inputTar==None or params.inputTar=='':
+            logging.error('Cannot have no SBML and no TAR input')
+            exit(0)
+        rpCofactorsUpload(params.inputTar,
+                          params.pathway_id,
+                          params.compartment_id,
+                          params.server_url,
+                          params.outputTar) 
+    else:
+        #make the tar.xz 
+        with tempfile.TemporaryDirectory() as tmpOutputFolder:
+            inputTar = tmpOutputFolder+'/tmp_input.tar.xz'
+            with tarfile.open(inputTar, mode='w:xz') as tf:
+                tf.add(params.sbml)
+            rpCofactorsUpload(inputTar,
+                              params.pathway_id,
+                              params.compartment_id,
+                              params.server_url,
+                              params.outputTar) 
