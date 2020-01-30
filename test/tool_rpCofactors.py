@@ -31,30 +31,36 @@ def rpCofactorsUpload(inputTar,
 #
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('Python wrapper to add cofactors to generate rpSBML collection')
-    parser.add_argument('-inputTar', type=str)
+    parser.add_argument('-input', type=str)
+    parser.add_argument('-output', type=str)
+    parser.add_argument('-format', type=str)
     parser.add_argument('-pathway_id', type=str)
     parser.add_argument('-compartment_id', type=str)
-    parser.add_argument('-outputTar', type=str)
-    parser.add_argument('-sbml', type=str)
     parser.add_argument('-server_url', type=str)
     params = parser.parse_args()
-    if params.sbml=='None' or params.sbml==None or params.sbml=='':
-        if params.inputTar=='None' or params.inputTar==None or params.inputTar=='':
-            logging.error('Cannot have no SBML and no TAR input')
-            exit(0)
-        rpCofactorsUpload(params.inputTar,
+    if params.format=='tar':
+        rpCofactorsUpload(params.input,
                           params.pathway_id,
                           params.compartment_id,
                           params.server_url,
-                          params.outputTar) 
-    else:
+                          params.output) 
+    elif params.format=='sbml':
         #make the tar.xz 
         with tempfile.TemporaryDirectory() as tmpOutputFolder:
             inputTar = tmpOutputFolder+'/tmp_input.tar.xz'
+            outputTar = tmpOutputFolder+'/tmp_output.tar.xz'
             with tarfile.open(inputTar, mode='w:xz') as tf:
-                tf.add(params.sbml)
+                tf.add(params.input)
             rpCofactorsUpload(inputTar,
                               params.pathway_id,
                               params.compartment_id,
                               params.server_url,
-                              params.outputTar) 
+                              outputTar) 
+            with tarfile.open(outputTar) as outTar
+                outTar.extractall(tmpOutputFolder)
+            out_file = glob.glob(tmpOutputFolder+'/*.rpsbml.xml')
+            if len(out_file)>1:
+                logging.warning('There are more than one output file...')
+            shutil.copy(out_file[0], params.output)
+    else:
+        logging.error('Cannot identify the input/output format: '+str(params.format))
