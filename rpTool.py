@@ -45,7 +45,7 @@ class rpCofactors:
                 pathway_cmp_mnxm[step_mono_cmp[0]] = rr_mono_cmp[0]
             else:
                 self.logger.warning('There should be only one compound on the left for monocomponent reaction: rr_mono_cmp: '+str(rr_mono_cmp)+' step_mono_cmp: '+str(step_mono_cmp))
-                return False
+                return False, ''
         ## add the side species
         for toAdd in full_reac.keys()-rr_reac.keys():
             step.update({toAdd: full_reac[toAdd]})
@@ -231,6 +231,6 @@ class rpCofactors:
                 #replace the reaction rule with new one
                 rpsbml.addUpdateBRSynth(reac, 'smiles', rp_path[stepNum]['reaction_rule'], None, True)
             else:
-                #if the cofactors cannot be found delete it from the list
+                #TODO: if the cofactors cannot be found delete it from the list
                 return False
         return True

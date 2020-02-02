@@ -101,8 +101,8 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
                 fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '').replace('.rpsbml', '')
                 rpsbml = rpSBML.rpSBML(fileName)
                 rpsbml.readSBML(sbml_path)
-                rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id)
-                rpsbml.writeSBML(tmpOutputFolder)
+                if rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id):
+                    rpsbml.writeSBML(tmpOutputFolder)
                 rpsbml = None
             with tarfile.open(fileobj=outputTar, mode='w:xz') as ot:
                 for sbml_path in glob.glob(tmpOutputFolder+'/*'):
