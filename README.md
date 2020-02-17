@@ -1,6 +1,36 @@
-# rpCofactors REST
+# rpCofactors
 
-REST service of rpCofactors. Takes as input a tar.xz of rpSBML files and outputs the same with cofactors added to the rpSBML.
+Because the reactions calculated by RetroPath2.0 are monocomponent reactions (only one product with possibly multiple subprates), to perform a full analysis the reactions need to be completed with the missing species. This tool does this by referring to the reaction description from wich it was generated. The following tool is a REST service that takes as input a tar.xz of rpSBML files (output by rpReader).
+
+## Information Flow
+
+### Input
+
+Required information:
+    * Either tar.xz input collection of rpSBML files or a single rpSBML file.
+
+Advanced options:
+    * Name of the heterologous pathway: (default: rp_pathway) The SBML groups ID (defined in rpReader) that points to the heterologous reactions and chemical species.
+    * SBML compartment ID: (default: MNXC3) Compartment ID to add the new chemical species. The default is the cytoplasm.
+    * REST IP address: The IP addrress of the REST service
+
+### Output
+
+* rpCofactors: A tar.xz archive containing a list of rpSBML files.
+
+## Installing
+
+To build the image using the Dockerfile, use the following command:
+
+```
+docker build -t brsynth/rpcofactors-rest:dev .
+```
+
+To run the service in the localhost:
+
+```
+docker run -p 8885:8888 brsynth/rpcofactors-rest:dev
+```
 
 ### Prerequisites
 
@@ -8,44 +38,13 @@ REST service of rpCofactors. Takes as input a tar.xz of rpSBML files and outputs
 * [libSBML](http://sbml.org/Software/libSBML)
 * [RDkit](https://www.rdkit.org)
 
-### Installing
-
-```
-docker build -t brsynth/rpcofactors-rest .
-```
-
-Run the service
-
-```
-docker run -p 8885:8888 brsynth/rpcofactors-rest
-```
-
-## Running the tests
-
-TODO
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+TODO
 
 ## Versioning
 
-TODO
+Version 0.1
 
 ## Authors
 
@@ -59,3 +58,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 * Thomas Duigou
 * Joan Hérisson
+
+### How to cite rpCofactors?
+
+TODO
