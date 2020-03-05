@@ -17,7 +17,7 @@ docker build -t brsynth/rpcofactors-standalone:dev .
 To test untar the test.tar.xz file and run the following command:
 
 ```
-python run.py -input test/test_rpReader.tar -output test_rpCofactors.tar -input_format tar
+python run.py -input test/test_rpReader.tar -output test/test_rpCofactors.tar -input_format tar
 ```
 
 ## Running the tests
