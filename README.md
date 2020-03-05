@@ -11,7 +11,13 @@ REST service of rpCofactors. Takes as input a tar.xz of rpSBML files and outputs
 ### Installing
 
 ```
-docker build -t brsynth/rpcofactors-standalone .
+docker build -t brsynth/rpcofactors-standalone:dev .
+```
+
+To test untar the test.tar.xz file and run the following command:
+
+```
+python run.py -input test/test_rpReader.tar -output test_rpCofactors.tar -input_format tar
 ```
 
 ## Running the tests
