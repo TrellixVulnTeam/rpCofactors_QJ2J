@@ -1,22 +1,22 @@
-# rpCofactors 
+# rpCofactors docker
 
-* rpCofactors Docker Image: [brsynth/rpCofactors-standalone](https://hub.docker.com/r/brsynth/rpcofactors-standalone)
+* Docker Image: [brsynth/rpcofactors-standalone](https://hub.docker.com/r/brsynth/rpcofactors-standalone)
 
-Completes monocomponent reaction output by RetroPath2.0 with the appropriate cofactors. Creates sub-paths when multiple reaction rules are associated with a single reaction. Inout may be a single SBML file or a collection within a tar.xz archive
+Completes monocomponent reaction output by RetroPath2.0 with the appropriate cofactors. Creates sub-paths when multiple reaction rules are associated with a single reaction. Input may be a single SBML file or a collection within a tar.xz archive
 
-### Input
+## Input
 
 Required:
-* **-input**: (String) Path to the input file. Can be either a single SBML file or a collection as a tar.xz archive file
-* **-input_format**: (String) 
+* **-input**: (string) Path to the input file. Can be either a single SBML file or a collection as a tar.xz archive file
+* **-input_format**: (string) 
 
 Advanced Options:
-* **-pathway_id**: (String) ID of the heterologous pathway in the SBML (default: rp_pathway)
-* **-compartment_id**: (String) ID of the SBML compartment where the heterologous pathway will be expressed in (default: MNXC3 (i.e. cytoplasm))
+* **-pathway_id**: (string, default: rp_pathway) ID of the heterologous pathway
+* **-compartment_id**: (string, default: MNXC3 (i.e. cytoplasm)) ID of the SBML compartment where the heterologous pathway will be expressed in (default: MNXC3 (i.e. cytoplasm))
 
-### Output
+## Output
 
-* **-output**
+* **-output**: (string) Path to the output file
 
 ## Building the docker
 
@@ -45,7 +45,7 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Versioning
 
-Version 0.1
+v0.1
 
 ## Authors
 
