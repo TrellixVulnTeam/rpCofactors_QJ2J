@@ -1,18 +1,32 @@
-# rpCofactors REST
+# rpCofactors 
 
-REST service of rpCofactors. Takes as input a tar.xz of rpSBML files and outputs the same with cofactors added to the rpSBML.
+* rpCofactors Docker Image: [brsynth/rpCofactors-standalone](https://hub.docker.com/r/brsynth/rpcofactors-standalone)
 
-### Prerequisites
+Completes monocomponent reaction output by RetroPath2.0 with the appropriate cofactors. Creates sub-paths when multiple reaction rules are associated with a single reaction. Inout may be a single SBML file or a collection within a tar.xz archive
 
-* [Docker](https://docs.docker.com/v17.09/engine/installation/)
-* [libSBML](http://sbml.org/Software/libSBML)
-* [RDkit](https://www.rdkit.org)
+### Input
 
-### Installing
+Required:
+* **-input**: (String) Path to the input file. Can be either a single SBML file or a collection as a tar.xz archive file
+* **-input_format**: (String) 
+
+Advanced Options:
+* **-pathway_id**: (String) ID of the heterologous pathway in the SBML (default: rp_pathway)
+* **-compartment_id**: (String) ID of the SBML compartment where the heterologous pathway will be expressed in (default: MNXC3 (i.e. cytoplasm))
+
+### Output
+
+* **-output**
+
+## Building the docker
+
+To build the docker locally, run the following command in the project directory: 
 
 ```
 docker build -t brsynth/rpcofactors-standalone:dev .
 ```
+
+## Running the test
 
 To test untar the test.tar.xz file and run the following command:
 
@@ -20,24 +34,10 @@ To test untar the test.tar.xz file and run the following command:
 python run.py -input test/test_rpReader.tar -output test/test_rpCofactors.tar -input_format tar
 ```
 
-## Running the tests
+## Dependencies
 
-TODO
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
+* Base docker image: [brsynth/rpBase](https://hub.docker.com/r/brsynth/rpbase)
+* Cache docker image: [brsynth/rpCache](https://hub.docker.com/r/brsynth/rpcache)
 
 ## Contributing
 
@@ -45,7 +45,7 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Versioning
 
-TODO
+Version 0.1
 
 ## Authors
 
@@ -59,3 +59,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 * Thomas Duigou
 * Joan Hérisson
+
+## How to cite rpCofactors?
