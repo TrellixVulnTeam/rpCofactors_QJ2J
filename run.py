@@ -19,7 +19,7 @@ import docker
 #
 def main(inputfile, output, input_format, pathway_id, compartment_id):
     docker_client = docker.from_env()
-    image_str = 'brsynth/rpcofactors-standalone:dev'
+    image_str = 'brsynth/rpcofactors-standalone'
     try:
         image = docker_client.images.get(image_str)
     except docker.errors.ImageNotFound:
