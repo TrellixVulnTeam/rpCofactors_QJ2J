@@ -45,7 +45,7 @@ class rpCofactors:
                 pathway_cmp_mnxm[step_mono_cmp[0]] = rr_mono_cmp[0]
             else:
                 self.logger.warning('There should be only one compound on the left for monocomponent reaction: rr_mono_cmp: '+str(rr_mono_cmp)+' step_mono_cmp: '+str(step_mono_cmp))
-                return False
+                return False, ''
         ## add the side species
         for toAdd in full_reac.keys()-rr_reac.keys():
             step.update({toAdd: full_reac[toAdd]})
@@ -53,7 +53,8 @@ class rpCofactors:
             try:
                 smi = self.mnxm_strc[toAdd]['smiles']
                 if not smi==None:
-                    rr_string += '.'+str(smi)
+                    for sto_add in range(int(full_reac[toAdd])):
+                        rr_string += '.'+str(smi)
             except KeyError:
                 self.logger.warning('Cannot find smiles structure for '+str(toAdd))
         ## Update the the stochio
@@ -95,46 +96,46 @@ class rpCofactors:
     def addCofactors_step(self, step, pathway_cmp_mnxm):
         reac_smiles_left = step['reaction_rule'].split('>>')[0]
         reac_smiles_right = step['reaction_rule'].split('>>')[1]
-        if self.rr_reactions[step['rule_id']][step['rule_mnxr']]['rel_direction']==-1:
-            isSuccess, reac_smiles_right = self.completeReac(step['right'], 
-                    self.rr_reactions[step['rule_id']][step['rule_mnxr']]['left'],
-                    self.full_reactions[step['rule_mnxr']]['right'], 
+        if self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['rel_direction']==-1:
+            isSuccess, reac_smiles_left = self.completeReac(step['right'],
+                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['left'],
+                    self.full_reactions[step['rule_ori_reac']['mnxr']]['right'],
                     True,
-                    reac_smiles_right,
-                    pathway_cmp_mnxm)
-            if not isSuccess:
-                self.logger.error('Could not recognise reaction rule for step '+str(step))
-                return False
-            isSuccess, reac_smiles_left = self.completeReac(step['left'],
-                    self.rr_reactions[step['rule_id']][step['rule_mnxr']]['right'],
-                    self.full_reactions[step['rule_mnxr']]['left'], 
-                    False,
                     reac_smiles_left,
                     pathway_cmp_mnxm)
             if not isSuccess:
                 self.logger.error('Could not recognise reaction rule for step '+str(step))
                 return False
-        elif self.rr_reactions[step['rule_id']][step['rule_mnxr']]['rel_direction']==1:
-            isSuccess, reac_smiles_right = self.completeReac(step['right'],
-                    self.rr_reactions[step['rule_id']][step['rule_mnxr']]['left'],
-                    self.full_reactions[step['rule_mnxr']]['left'], 
-                    True,
+            isSuccess, reac_smiles_right = self.completeReac(step['left'],
+                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['right'],
+                    self.full_reactions[step['rule_ori_reac']['mnxr']]['left'],
+                    False,
                     reac_smiles_right,
                     pathway_cmp_mnxm)
             if not isSuccess:
                 self.logger.error('Could not recognise reaction rule for step '+str(step))
                 return False
-            isSuccess, reac_smiles_left = self.completeReac(step['left'],
-                    self.rr_reactions[step['rule_id']][step['rule_mnxr']]['right'],
-                    self.full_reactions[step['rule_mnxr']]['right'], 
-                    False,
+        elif self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['rel_direction']==1:
+            isSuccess, reac_smiles_left = self.completeReac(step['right'],
+                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['left'],
+                    self.full_reactions[step['rule_ori_reac']['mnxr']]['left'],
+                    True,
                     reac_smiles_left,
+                    pathway_cmp_mnxm)
+            if not isSuccess:
+                self.logger.error('Could not recognise reaction rule for step '+str(step))
+                return False
+            isSuccess, reac_smiles_right = self.completeReac(step['left'],
+                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['right'],
+                    self.full_reactions[step['rule_ori_reac']['mnxr']]['right'],
+                    False,
+                    reac_smiles_right,
                     pathway_cmp_mnxm)
             if not isSuccess:
                 self.logger.error('Could not recognise reaction rule for step '+str(step))
                 return False
         else:
-            self.logger.error('Relative direction can only be 1 or -1: '+str(self.rr_reactions[step['rule_id']][step['rule_mnxr']]['rel_direction']))
+            self.logger.error('Relative direction can only be 1 or -1: '+str(self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['rel_direction']))
             return False
         step['reaction_rule'] = reac_smiles_left+'>>'+reac_smiles_right
         return True
@@ -162,6 +163,7 @@ class rpCofactors:
                 products = set(set(rp_path[stepNum]['right'].keys())-set(ori_rp_path[stepNum]['right'].keys()))
                 for species in reactants|products:
                     #check to make sure that they do not yet exist and if not create a new one
+                    #TODO, replace the species with an existing one if it is contained in the MIRIAM annotations
                     if not rpsbml.speciesExists(species, compartment_id):
                         xref = {}
                         inchi = None
@@ -226,7 +228,9 @@ class rpCofactors:
                     subs.setSpecies(str(sub)+'__64__'+str(compartment_id))
                     subs.setConstant(True)
                     subs.setStoichiometry(rp_path[stepNum]['left'][sub])
+                #replace the reaction rule with new one
+                rpsbml.addUpdateBRSynth(reac, 'smiles', rp_path[stepNum]['reaction_rule'], None, True)
             else:
-                #if the cofactors cannot be found delete it from the list
+                #TODO: if the cofactors cannot be found delete it from the list
                 return False
         return True

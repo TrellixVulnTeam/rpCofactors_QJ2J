@@ -55,36 +55,22 @@ class RestApp(Resource):
         return jsonify(stamp(None))
 
 
-## Run a single
-#
-#
-def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartment_id):
-    #open one of the rp SBML files
-    rpsbml = rpSBML.rpSBML(member_name, libsbml.readSBMLFromString(rpsbml_string))
-    if rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id):
-        return libsbml.writeSBMLToString(rpsbml.document).encode('utf-8')
-    else:
-        return ''
-
-
 ##
 #
-#
+# TODO: fix with new
 def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
     #loop through all of them and run FBA on them
     with tarfile.open(fileobj=outputTar, mode='w:xz') as tf:
         with tarfile.open(fileobj=inputTar, mode='r:xz') as in_tf:
             for member in in_tf.getmembers():
                 if not member.name=='':
-                    data = singleCofactors(rpcofactors,
-                            member.name,
-                            in_tf.extractfile(member).read().decode('utf-8'),
-                            pathway_id,
-                            compartment_id)
-                    if not data=='':
-                        fiOut = io.BytesIO(data)
-                        info = tarfile.TarInfo(member.name)
-                        info.size = len(data)
+                    fileName = member.name.replace('.sbml', '').replace('.xml', '').replace('.rpsbml', '')
+                    rpsbml = rpSBML.rpSBML(filename, libsbml.readSBMLFromString(in_tf.extractfile(member).read().decode("utf-8")))
+                    if rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id):
+                        sbml_bytes = libsbml.writeSBMLToString(rpsbml.document).encode('utf-8')
+                        fiOut = io.BytesIO(sbml_bytes)
+                        info = tarfile.TarInfo(fileName+'.rpsbml.xml')
+                        info.size = len(sbml_bytes)
                         tf.addfile(tarinfo=info, fileobj=fiOut)
 
 
@@ -98,16 +84,15 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
             tar.extractall(path=tmpInputFolder)
             tar.close()
             for sbml_path in glob.glob(tmpInputFolder+'/*'):
-                fileName = sbml_path.split('/')[-1].replace('.sbml.xml', '')
+                fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '').replace('.rpsbml', '')
                 rpsbml = rpSBML.rpSBML(fileName)
                 rpsbml.readSBML(sbml_path)
-                rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id)
-                rpsbml.writeSBML(tmpOutputFolder)
+                if rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id):
+                    rpsbml.writeSBML(tmpOutputFolder)
                 rpsbml = None
             with tarfile.open(fileobj=outputTar, mode='w:xz') as ot:
                 for sbml_path in glob.glob(tmpOutputFolder+'/*'):
-                    fileName = str(sbml_path.split('/')[-1].replace('.sbml', ''))
-                    fileName += '.sbml.xml'
+                    fileName = str(sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '').replace('.rpsbml', ''))+'.rpsbml.xml'
                     info = tarfile.TarInfo(fileName)
                     info.size = os.path.getsize(sbml_path)
                     ot.addfile(tarinfo=info, fileobj=open(sbml_path, 'rb'))
