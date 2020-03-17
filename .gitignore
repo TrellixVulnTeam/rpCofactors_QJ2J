@@ -5,4 +5,6 @@ rpSBML.py
 __pycache__/
 tmp/
 test/
+.ipynb_checkpoints/
+*.ipynb
 rpCache.py

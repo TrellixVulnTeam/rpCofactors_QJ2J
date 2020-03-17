@@ -12,6 +12,8 @@ import requests
 import tempfile
 import tarfile
 import os
+import glob
+import shutil
 
 def rpCofactorsUpload(inputTar,
         pathway_id,
@@ -35,9 +37,9 @@ if __name__ == "__main__":
     parser.add_argument('-input', type=str)
     parser.add_argument('-output', type=str)
     parser.add_argument('-input_format', type=str)
-    parser.add_argument('-pathway_id', type=str)
-    parser.add_argument('-compartment_id', type=str)
-    parser.add_argument('-server_url', type=str)
+    parser.add_argument('-pathway_id', type=str, default='rp_pathway')
+    parser.add_argument('-compartment_id', type=str, default='MNXC3')
+    parser.add_argument('-server_url', type=str, default='http://0.0.0.0:8888/REST')
     params = parser.parse_args()
     if params.input_format=='tar':
         rpCofactorsUpload(params.input,
@@ -50,19 +52,9 @@ if __name__ == "__main__":
         with tempfile.TemporaryDirectory() as tmpOutputFolder:
             inputTar = tmpOutputFolder+'/tmp_input.tar.xz'
             outputTar = tmpOutputFolder+'/tmp_output.tar.xz'
-            print(params.input)
             with tarfile.open(inputTar, mode='w:xz') as tf:
                 info = tarfile.TarInfo('single.rpsbml.xml') #need to change the name since galaxy creates .dat files
                 info.size = os.path.getsize(params.input)
-                #info = tarfile.gettarinfo(fileobj=params.input)
-                #info.arcname = 'single.rpsbml.xml'
-                tf.addfile(tarinfo=info, fileobj=open(params.input, 'rb'))
-                tf.list()
-            with tarfile.open('/home/mdulac/Downloads/test_out.tar.xz', mode='w:xz') as tf:
-                info = tarfile.TarInfo('single.rpsbml.xml') #need to change the name since galaxy creates .dat files
-                info.size = os.path.getsize(params.input)
-                #info = tarfile.gettarinfo(fileobj=params.input)
-                #info.arcname = 'single.rpsbml.xml'
                 tf.addfile(tarinfo=info, fileobj=open(params.input, 'rb'))
             rpCofactorsUpload(inputTar,
                               params.pathway_id,

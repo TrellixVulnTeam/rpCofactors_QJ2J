@@ -1,22 +1,23 @@
-# rpCofactors
+# rpCofactors docker
 
-Because the reactions calculated by RetroPath2.0 are monocomponent reactions (only one product with possibly multiple substrates), to perform a full analysis, the reactions need to be completed with the missing species. This tool performs that action this by referring to the reaction description from wich it was generated. The following tool is a REST service that takes as input a tar.xz of rpSBML files (output by rpReader).
+* Docker Image: [brsynth/rpcofactors-standalone](https://hub.docker.com/r/brsynth/rpcofactors-standalone)
 
-## Information Flow
+Completes monocomponent reaction output by RetroPath2.0 with the appropriate cofactors. Creates sub-paths when multiple reaction rules are associated with a single reaction. Input may be a single SBML file or a collection within a tar.xz archive
 
-### Input
+## Input
 
-Required information:
-* **rpSBML input**: Either tar.xz input collection of rpSBML files or a single rpSBML file.
+Required:
+* **-input**: (string) Path to the input file. Can be either a single SBML file or a collection as a tar.xz archive file
+* **-input_format**: (string) 
 
-Advanced options:
-* **Name of the heterologous pathway**: (default: rp_pathway) The SBML groups ID (defined in rpReader) that points to the heterologous reactions and chemical species.
-* **SBML compartment ID**: (default: MNXC3) Compartment ID to add the new chemical species. The default is the cytoplasm.
-* **REST IP address**: The IP addrress of the REST service
+Advanced Options:
+* **-pathway_id**: (string, default: rp_pathway) ID of the heterologous pathway
+* **-compartment_id**: (string, default: MNXC3 (i.e. cytoplasm)) ID of the SBML compartment where the heterologous pathway will be expressed in (default: MNXC3 (i.e. cytoplasm))
+* **server_url**: (string, default: http://0.0.0.0:8888/REST) IP address of the REST service
 
-### Output
+## Output
 
-* **rpCofactors**: A tar.xz archive containing a list of rpSBML files.
+* **-output**: (string) Path to the output file
 
 ## Installing
 
@@ -29,22 +30,29 @@ docker build -t brsynth/rpcofactors-rest .
 To run the service in the localhost:
 
 ```
-docker run -p 8885:8888 brsynth/rpcofactors-rest
+docker run -p 8888:8888 brsynth/rpcofactors-rest:dev
 ```
 
-### Prerequisites
+### Running the test
 
-* [Docker](https://docs.docker.com/v17.09/engine/installation/)
-* [libSBML](http://sbml.org/Software/libSBML)
-* [RDkit](https://www.rdkit.org)
+Untar the test.tar.xz file and run the following command:
+
+```
+python tool_rpCofactors.py -input test_rpReader.tar -input_format tar -output test_rpCofactors.tar
+```
+
+## Dependencies
+
+* Base docker image: [brsynth/rpBase](https://hub.docker.com/r/brsynth/rpbase)
+* Cache docker image: [brsynth/rpCache](https://hub.docker.com/r/brsynth/rpcache)
 
 ## Contributing
 
-TODO
+Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
-Version 0.1
+v0.1
 
 ## Authors
 
@@ -59,6 +67,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * Thomas Duigou
 * Joan Hérisson
 
-### How to cite rpCofactors?
-
-TODO
+## How to cite rpCofactors?
