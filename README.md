@@ -30,7 +30,7 @@ docker build -t brsynth/rpcofactors-rest .
 To run the service in the localhost:
 
 ```
-docker run -p 8888:8888 brsynth/rpcofactors-rest:dev
+docker run -p 8888:8888 brsynth/rpcofactors-rest
 ```
 
 ### Running the test
