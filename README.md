@@ -1,4 +1,4 @@
-# rpCofactors docker
+# rpCofactors
 
 * Docker Image: [brsynth/rpcofactors-standalone](https://hub.docker.com/r/brsynth/rpcofactors-standalone)
 
@@ -18,6 +18,11 @@ Advanced Options:
 
 * **-output**: (string) Path to the output file
 
+## Dependencies
+
+* Base docker image: [brsynth/rpBase](https://hub.docker.com/r/brsynth/rpbase)
+* Cache docker image: [brsynth/rpCache](https://hub.docker.com/r/brsynth/rpcache)
+
 ## Building the docker
 
 To build the docker locally, run the following command in the project directory: 
@@ -33,11 +38,6 @@ To test untar the test.tar.xz file and run the following command:
 ```
 python run.py -input test/test_rpReader.tar -output test/test_rpCofactors.tar -input_format tar
 ```
-
-## Dependencies
-
-* Base docker image: [brsynth/rpBase](https://hub.docker.com/r/brsynth/rpbase)
-* Cache docker image: [brsynth/rpCache](https://hub.docker.com/r/brsynth/rpcache)
 
 ## Contributing
 
