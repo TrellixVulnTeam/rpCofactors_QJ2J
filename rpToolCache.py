@@ -44,11 +44,13 @@ class rpToolCache(rpCache):
     def _loadCache(self, fetchInputFiles=False):
 
         dirname = os.path.dirname(os.path.abspath( __file__ ))
-
-        if not os.path.isfile(dirname+'/cache/full_reactions.pickle'):
-            pickle.dump(self.full_reac(dirname+'/input_cache/rxn_recipes.tsv'),
-                    open(dirname+'/cache/full_reactions.pickle', 'wb'))
-        self.full_reactions = pickle.load(open(dirname+'/cache/full_reactions.pickle', 'rb'))
+        if not os.path.exists(os.path.join(dirname, 'cache')):
+            os.mkdir(os.path.exists(os.path.join(dirname, 'cache')))
+			
+        if not os.path.isfile(os.path.join(dirname, 'cache', 'full_reactions.pickle')):
+            pickle.dump(self.full_reac(os.path.join(dirname, 'input_cache', 'rxn_recipes.tsv')),
+                    open(os.path.join(dirname, 'cache', 'full_reactions.pickle'), 'wb'))
+        self.full_reactions = pickle.load(open(os.path.join(dirname, 'cache', 'full_reactions.pickle'), 'rb'))
 
         return super()._loadCache(fetchInputFiles)
 

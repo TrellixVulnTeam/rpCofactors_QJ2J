@@ -24,8 +24,8 @@ if __name__ == "__main__":
     parser.add_argument('-input', type=str)
     parser.add_argument('-output', type=str)
     parser.add_argument('-input_format', type=str)
-    parser.add_argument('-pathway_id', type=str)
-    parser.add_argument('-compartment_id', type=str)
+    parser.add_argument('-pathway_id', type=str, default='rp_pathway')
+    parser.add_argument('-compartment_id', type=str, default='MNXC3')
     params = parser.parse_args()
     if params.input_format=='tar':
         rpToolServe.main(params.input,
