@@ -232,5 +232,6 @@ class rpCofactors:
                 rpsbml.addUpdateBRSynth(reac, 'smiles', rp_path[stepNum]['reaction_rule'], None, True)
             else:
                 #if the cofactors cannot be found delete it from the list
+                self.logger.warning('Cannot find cofactors... skipping') 
                 return False
         return True
