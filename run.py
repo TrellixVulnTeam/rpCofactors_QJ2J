@@ -17,7 +17,7 @@ import docker
 ##
 #
 #
-def main(inputfile, output, input_format, pathway_id, compartment_id):
+def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_id='MNXC3'):
     docker_client = docker.from_env()
     image_str = 'brsynth/rpcofactors-standalone'
     try:
@@ -46,14 +46,15 @@ def main(inputfile, output, input_format, pathway_id, compartment_id):
         container = docker_client.containers.run(image_str, 
                                                  command, 
                                                  detach=True, 
-                                                 stderr=True, 
+                                                 stderr=True,
                                                  volumes={tmpOutputFolder+'/': {'bind': '/home/tmp_output', 'mode': 'rw'}})
         container.wait()
         err = container.logs(stdout=False, stderr=True)
-        print(err)
-        shutil.copy(tmpOutputFolder+'/output.dat', output)
+        err_str = err.decode('utf-8')
+        print(err_str)
+        if not 'ERROR' in err_str:
+            shutil.copy(tmpOutputFolder+'/output.dat', output)
         container.remove()
- 
 
 
 ##
@@ -67,4 +68,4 @@ if __name__ == "__main__":
     parser.add_argument('-pathway_id', type=str, default='rp_pathway')
     parser.add_argument('-compartment_id', type=str, default='MNXC3')
     params = parser.parse_args()
-    main(params.input, params.output, params.input_format, params.pathway_id, params.compartment_id)
+    main(params.input, params.input_format, params.output, params.pathway_id, params.compartment_id)
