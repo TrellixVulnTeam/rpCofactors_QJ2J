@@ -10,6 +10,7 @@ Created on September 21 2019
 import os
 import json
 import libsbml
+import logging
 import io
 import tarfile
 import csv
