@@ -42,8 +42,8 @@ def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartme
 #
 def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
     #loop through all of them and run FBA on them
-    with tarfile.open(fileobj=outputTar, mode='w:xz') as tf:
-        with tarfile.open(fileobj=inputTar, mode='r:xz') as in_tf:
+    with tarfile.open(fileobj=outputTar, mode='w:gz') as tf:
+        with tarfile.open(fileobj=inputTar, mode='r:gz') as in_tf:
             for member in in_tf.getmembers():
                 if not member.name=='':
                     data = singleCofactors(rpcofactors,
@@ -80,10 +80,10 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
             if len(glob.glob(tmpOutputFolder+'/*'))==0:
                 logging.error('rpCofactors has not produced any results')
                 return False
-            with tarfile.open(outputTar, mode='w:xz') as ot:
+            with tarfile.open(outputTar, mode='w:gz') as ot:
                 for sbml_path in glob.glob(tmpOutputFolder+'/*'):
                     fileName = str(sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '').replace('.rpsbml', ''))
-                    fileName += '.rpsbml.xml'
+                    fileName += '.sbml.xml'
                     info = tarfile.TarInfo(fileName)
                     info.size = os.path.getsize(sbml_path)
                     ot.addfile(tarinfo=info, fileobj=open(sbml_path, 'rb'))
