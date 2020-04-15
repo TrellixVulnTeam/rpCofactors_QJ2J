@@ -1,6 +1,12 @@
 import copy
 import logging
 
+logging.basicConfig(
+    level=logging.ERROR,
+    format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+    datefmt='%d-%m-%Y %H:%M:%S',
+)
+
 ## Class to add the cofactors to a monocomponent reaction to construct the full reaction
 #
 #

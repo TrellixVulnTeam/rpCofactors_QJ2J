@@ -10,6 +10,7 @@ Created on September 21 2019
 import os
 import json
 import libsbml
+import logging
 import io
 import tarfile
 import csv
@@ -23,6 +24,8 @@ import rpTool as rpCofactors
 import rpToolCache
 import rpSBML
 
+logging.disable(logging.INFO)
+logging.disable(logging.WARNING)
 
 ## Run a single
 #
@@ -41,8 +44,8 @@ def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartme
 #
 def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
     #loop through all of them and run FBA on them
-    with tarfile.open(fileobj=outputTar, mode='w:xz') as tf:
-        with tarfile.open(fileobj=inputTar, mode='r:xz') as in_tf:
+    with tarfile.open(fileobj=outputTar, mode='w:gz') as tf:
+        with tarfile.open(fileobj=inputTar, mode='r:gz') as in_tf:
             for member in in_tf.getmembers():
                 if not member.name=='':
                     data = singleCofactors(rpcofactors,
@@ -66,6 +69,9 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
             tar = tarfile.open(inputTar, mode='r')
             tar.extractall(path=tmpInputFolder)
             tar.close()
+            if len(glob.glob(tmpInputFolder+'/*'))==0:
+                logging.error('Input file is empty')
+                return False
             for sbml_path in glob.glob(tmpInputFolder+'/*'):
                 fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '').replace('.rpsbml', '')
                 rpsbml = rpSBML.rpSBML(fileName)
@@ -73,13 +79,17 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
                 rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id)
                 rpsbml.writeSBML(tmpOutputFolder)
                 rpsbml = None
-            with tarfile.open(fileobj=outputTar, mode='w:xz') as ot:
+            if len(glob.glob(tmpOutputFolder+'/*'))==0:
+                logging.error('rpCofactors has not produced any results')
+                return False
+            with tarfile.open(outputTar, mode='w:gz') as ot:
                 for sbml_path in glob.glob(tmpOutputFolder+'/*'):
                     fileName = str(sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '').replace('.rpsbml', ''))
-                    fileName += '.rpsbml.xml'
+                    fileName += '.sbml.xml'
                     info = tarfile.TarInfo(fileName)
                     info.size = os.path.getsize(sbml_path)
                     ot.addfile(tarinfo=info, fileobj=open(sbml_path, 'rb'))
+    return True
 
 
 ##
@@ -98,13 +108,13 @@ def main(inputTar,
     rpcofactors.chemXref = rpcache.chemXref
     rpcofactors.rr_reactions = rpcache.rr_reactions
     #pass the files to the rpReader
-    outputTar_bytes = io.BytesIO()
+    #outputTar_bytes = io.BytesIO()
     ######## HDD #######
-    runCofactors_hdd(rpcofactors, inputTar, outputTar_bytes, pathway_id, compartment_id)
+    runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id, compartment_id)
     ######## MEM #######
     #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
     ########## IMPORTANT #####
-    outputTar_bytes.seek(0)
+    #outputTar_bytes.seek(0)
     ##########################
-    with open(outputTar, 'wb') as f:
-        shutil.copyfileobj(outputTar_bytes, f, length=131072)
+    #with open(outputTar, 'wb') as f:
+    #    shutil.copyfileobj(outputTar_bytes, f, length=131072)
