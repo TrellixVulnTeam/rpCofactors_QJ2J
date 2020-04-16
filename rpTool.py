@@ -1,11 +1,6 @@
 import copy
 import logging
 
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
-    datefmt='%d-%m-%Y %H:%M:%S',
-)
 
 ## Class to add the cofactors to a monocomponent reaction to construct the full reaction
 #
@@ -238,6 +233,6 @@ class rpCofactors:
                 rpsbml.addUpdateBRSynth(reac, 'smiles', rp_path[stepNum]['reaction_rule'], None, True)
             else:
                 #if the cofactors cannot be found delete it from the list
-                self.logger.warning('Cannot find cofactors... skipping') 
+                self.logger.warning('Cannot find cofactors... skipping')
                 return False
         return True
