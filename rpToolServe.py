@@ -21,7 +21,8 @@ import shutil
 
 sys.path.insert(0, '/home/')
 import rpTool as rpCofactors
-import rpToolCache
+#import rpToolCache
+import rpCache
 import rpSBML
 
 
@@ -97,13 +98,14 @@ def main(inputTar,
          outputTar,
          pathway_id,
          compartment_id):
-    rpcache = rpToolCache.rpToolCache()
+    #rpcache = rpToolCache.rpToolCache()
+    rpcache = rpCache.rpCache()
     rpcofactors = rpCofactors.rpCofactors()
-    rpcofactors.deprecatedMNXM_mnxm = rpcache.deprecatedMNXM_mnxm
-    rpcofactors.deprecatedMNXR_mnxr = rpcache.deprecatedMNXR_mnxr
-    rpcofactors.mnxm_strc = rpcache.mnxm_strc
-    rpcofactors.full_reactions = rpcache.full_reactions
-    rpcofactors.chemXref = rpcache.chemXref
+    rpcofactors.deprecatedCID_cid = rpcache.deprecatedCID_cid
+    rpcofactors.deprecatedRID_rid = rpcache.deprecatedRID_rid
+    rpcofactors.cid_strc = rpcache.cid_strc
+    rpcofactors.rr_full_reactions = rpcache.rr_full_reactions
+    rpcofactors.cid_xref = rpcache.cid_xref
     rpcofactors.rr_reactions = rpcache.rr_reactions
     #pass the files to the rpReader
     #outputTar_bytes = io.BytesIO()

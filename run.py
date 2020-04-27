@@ -19,7 +19,7 @@ import docker
 #
 def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_id='MNXC3'):
     docker_client = docker.from_env()
-    image_str = 'brsynth/rpcofactors-standalone:dev'
+    image_str = 'brsynth/rpcofactors-standalone:newrules'
     try:
         image = docker_client.images.get(image_str)
     except docker.errors.ImageNotFound:
@@ -51,9 +51,9 @@ def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_i
         container.wait()
         err = container.logs(stdout=False, stderr=True)
         err_str = err.decode('utf-8')
-        print(err_str)
         if not 'ERROR' in err_str:
             shutil.copy(tmpOutputFolder+'/output.dat', output)
+            logging,info('\n'+err_str)
         container.remove()
 
 

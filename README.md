@@ -28,12 +28,20 @@ Advanced Options:
 To build the docker locally, run the following command in the project directory: 
 
 ```
-docker build -t brsynth/rpcofactors-standalone:dev .
+docker build -t brsynth/rpcofactors-standalone:newrules .
 ```
 
 ## Running the test
 
-To test untar the test.tar.xz file and run the following command:
+To test untar the test.tar.xz file and run the following commands:
+
+#### Locally
+
+```
+python tool_rpCofactors.py -input test/test_rpReader.tar -output test/test_rpCofactors.tar -input_format tar
+```
+
+#### Docker
 
 ```
 python run.py -input test/test_rpReader.tar -output test/test_rpCofactors.tar -input_format tar
