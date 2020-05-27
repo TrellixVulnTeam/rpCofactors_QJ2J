@@ -23,7 +23,7 @@ sys.path.insert(0, '/home/')
 import rpTool as rpCofactors
 import rpToolCache
 import rpSBML
-import rpUnicity
+import tool_rpUnicity
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -31,10 +31,8 @@ logging.basicConfig(
     datefmt='%d-%m-%Y %H:%M:%S',
 )
 
-'''
 logging.disable(logging.INFO)
 logging.disable(logging.WARNING)
-'''
 
 ## Run a single
 #
@@ -124,4 +122,4 @@ def main(inputTar,
         ######## MEM #######
         #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
         ####### rpUnicity ######
-        rpUnicity.deduplicate(tmpResFolder+'/tmpRes.tar', outputTar)
+        tool_rpUnicity.deduplicate(tmpResFolder+'/tmpRes.tar', outputTar)
