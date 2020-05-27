@@ -24,8 +24,16 @@ import rpTool as rpCofactors
 import rpToolCache
 import rpSBML
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+    datefmt='%d-%m-%Y %H:%M:%S',
+)
+
+'''
 logging.disable(logging.INFO)
 logging.disable(logging.WARNING)
+'''
 
 ## Run a single
 #
@@ -45,7 +53,7 @@ def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartme
 def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
     #loop through all of them and run FBA on them
     with tarfile.open(fileobj=outputTar, mode='w:gz') as tf:
-        with tarfile.open(fileobj=inputTar, mode='r:gz') as in_tf:
+        with tarfile.open(fileobj=inputTar, mode='r') as in_tf:
             for member in in_tf.getmembers():
                 if not member.name=='':
                     data = singleCofactors(rpcofactors,
@@ -113,8 +121,3 @@ def main(inputTar,
     runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id, compartment_id)
     ######## MEM #######
     #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
-    ########## IMPORTANT #####
-    #outputTar_bytes.seek(0)
-    ##########################
-    #with open(outputTar, 'wb') as f:
-    #    shutil.copyfileobj(outputTar_bytes, f, length=131072)

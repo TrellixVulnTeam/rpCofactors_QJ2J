@@ -1,11 +1,6 @@
 import copy
 import logging
 
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
-    datefmt='%d-%m-%Y %H:%M:%S',
-)
 
 ## Class to add the cofactors to a monocomponent reaction to construct the full reaction
 #
@@ -27,6 +22,33 @@ class rpCofactors:
         self.full_reactions = None
         self.chemXref = None
         self.rr_reactions = None
+
+
+    ################################################################
+    ######################## PRIVATE FUNCTIONS #####################
+    ################################################################
+
+
+    ## Function to create a dictionnary of old to new reaction id's
+    #
+    # TODO: check other things about the mnxm emtry like if it has the right structure etc...
+    def _checkMNXRdeprecated(self, mnxr):
+        try:
+            return self.deprecatedMNXR_mnxr[mnxr]
+        except KeyError:
+            return mnxr
+
+    ## Function to create a dictionnary of old to new chemical id's
+    #
+    #  Generate a one-to-one dictionnary of old id's to new ones. Private function
+    #
+    # TODO: check other things about the mnxm emtry like if it has the right structure etc...
+    def _checkMNXMdeprecated(self, mnxm):
+        try:
+            return self.deprecatedMNXM_mnxm[mnxm]
+        except KeyError:
+            return mnxm
+
 
     ################################################################
     ######################### PUBLIC FUNCTIONS #####################
@@ -102,46 +124,47 @@ class rpCofactors:
     def addCofactors_step(self, step, pathway_cmp_mnxm):
         reac_smiles_left = step['reaction_rule'].split('>>')[0]
         reac_smiles_right = step['reaction_rule'].split('>>')[1]
-        if self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['rel_direction']==-1:
+        ori_reac_mnxr = self._checkMNXRdeprecated(step['rule_ori_reac']['mnxr'])
+        if self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']==-1:
             isSuccess, reac_smiles_left = self.completeReac(step['right'],
-                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['left'],
-                    self.full_reactions[step['rule_ori_reac']['mnxr']]['right'],
-                    True,
-                    reac_smiles_left,
-                    pathway_cmp_mnxm)
+                                                            self.rr_reactions[step['rule_id']][ori_reac_mnxr]['left'],
+                                                            self.full_reactions[ori_reac_mnxr]['right'],
+                                                            True,
+                                                            reac_smiles_left,
+                                                            pathway_cmp_mnxm)
             if not isSuccess:
                 self.logger.error('Could not recognise reaction rule for step '+str(step))
                 return False
             isSuccess, reac_smiles_right = self.completeReac(step['left'],
-                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['right'],
-                    self.full_reactions[step['rule_ori_reac']['mnxr']]['left'],
-                    False,
-                    reac_smiles_right,
-                    pathway_cmp_mnxm)
+                                                             self.rr_reactions[step['rule_id']][ori_reac_mnxr]['right'],
+                                                             self.full_reactions[ori_reac_mnxr]['left'],
+                                                             False,
+                                                             reac_smiles_right,
+                                                             pathway_cmp_mnxm)
             if not isSuccess:
                 self.logger.error('Could not recognise reaction rule for step '+str(step))
                 return False
-        elif self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['rel_direction']==1:
+        elif self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']==1:
             isSuccess, reac_smiles_left = self.completeReac(step['right'],
-                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['left'],
-                    self.full_reactions[step['rule_ori_reac']['mnxr']]['left'],
-                    True,
-                    reac_smiles_left,
-                    pathway_cmp_mnxm)
+                                                            self.rr_reactions[step['rule_id']][ori_reac_mnxr]['left'],
+                                                            self.full_reactions[ori_reac_mnxr]['left'],
+                                                            True,
+                                                            reac_smiles_left,
+                                                            pathway_cmp_mnxm)
             if not isSuccess:
                 self.logger.error('Could not recognise reaction rule for step '+str(step))
                 return False
             isSuccess, reac_smiles_right = self.completeReac(step['left'],
-                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['right'],
-                    self.full_reactions[step['rule_ori_reac']['mnxr']]['right'],
-                    False,
-                    reac_smiles_right,
-                    pathway_cmp_mnxm)
+                                                             self.rr_reactions[step['rule_id']][ori_reac_mnxr]['right'],
+                                                             self.full_reactions[ori_reac_mnxr]['right'],
+                                                             False,
+                                                             reac_smiles_right,
+                                                             pathway_cmp_mnxm)
             if not isSuccess:
                 self.logger.error('Could not recognise reaction rule for step '+str(step))
                 return False
         else:
-            self.logger.error('Relative direction can only be 1 or -1: '+str(self.rr_reactions[step['rule_id']][step['rule_ori_reac']['mnxr']]['rel_direction']))
+            self.logger.error('Relative direction can only be 1 or -1: '+str(self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']))
             return False
         step['reaction_rule'] = reac_smiles_left+'>>'+reac_smiles_right
         return True
@@ -171,57 +194,45 @@ class rpCofactors:
                     #check to make sure that they do not yet exist and if not create a new one
                     #TODO, replace the species with an existing one if it is contained in the MIRIAM annotations
                     if not rpsbml.speciesExists(species, compartment_id):
+                        tmp_species = self._checkMNXMdeprecated(species)
                         xref = {}
                         inchi = None
                         inchikey = None
                         smiles = None
+                        chemName = None
                         try:
-                            xref = self.chemXref[species]
+                            xref = self.chemXref[tmp_species]
                         except KeyError:
-                            try:
-                                xref = self.chemXref[self.deprecatedMNXM_mnxm[species]]
-                            except KeyError:
-                                #TODO: although there should not be any
-                                #intermediate species here consider
-                                #removing this warning
-                                self.logger.warning('Cannot find the xref for this species: '+str(species))
-                                pass
+                            self.logger.warning('Cannot find the xref for this species: '+str(tmp_species))
+                            pass
                         try:
-                            inchi = self.mnxm_strc[species]['inchi']
+                            inchi = self.mnxm_strc[tmp_species]['inchi']
                         except KeyError:
-                            try:
-                                inchi = self.mnxm_strc[self.deprecatedMNXM_mnxm[species]]['inchi']
-                            except KeyError:
-                                self.logger.warning('Cannot find the inchi for this species: '+str(species))
-                                pass
+                            self.logger.warning('Cannot find the inchi for this species: '+str(tmp_species))
+                            pass
                         try:
-                            inchikey = self.mnxm_strc[species]['inchikey']
+                            inchikey = self.mnxm_strc[tmp_species]['inchikey']
                         except KeyError:
-                            try:
-                                inchikey = self.mnxm_strc[self.deprecatedMNXM_mnxm[species]]['inchikey']
-                            except KeyError:
-                                self.logger.warning('Cannot find the inchikey for this species: '+str(species))
-                                pass
+                            self.logger.warning('Cannot find the inchikey for this species: '+str(tmp_species))
+                            pass
                         try:
-                            smiles = self.mnxm_strc[species]['smiles']
+                            smiles = self.mnxm_strc[tmp_species]['smiles']
                         except KeyError:
-                            try:
-                                smiles = self.mnxm_strc[self.deprecatedMNXM_mnxm[species]]['smiles']
-                            except KeyError:
-                                self.logger.warning('Cannot find the smiles for this species: '+str(species))
-                                pass
+                            self.logger.warning('Cannot find the smiles for this species: '+str(tmp_species))
+                            pass
                         #add the new species to rpsbml
                         try:
-                            chemName = self.mnxm_strc[species]['name']
+                            chemName = self.mnxm_strc[tmp_species]['name']
                         except KeyError:
-                            chemName = None
-                        rpsbml.createSpecies(species,
-                                compartment_id,
-                                chemName,
-                                xref,
-                                inchi,
-                                inchikey,
-                                smiles)
+                            self.logger.warning('Cannot find the name for this species: '+str(tmp_species))
+                            pass
+                        rpsbml.createSpecies(tmp_species,
+                                             compartment_id,
+                                             chemName,
+                                             xref,
+                                             inchi,
+                                             inchikey,
+                                             smiles)
                 #add the new species to the RP reactions
                 reac = rpsbml.model.getReaction(rp_path[stepNum]['reaction_id'])
                 for pro in products:
@@ -238,6 +249,6 @@ class rpCofactors:
                 rpsbml.addUpdateBRSynth(reac, 'smiles', rp_path[stepNum]['reaction_rule'], None, True)
             else:
                 #if the cofactors cannot be found delete it from the list
-                self.logger.warning('Cannot find cofactors... skipping') 
+                self.logger.warning('Cannot find cofactors... skipping')
                 return False
         return True
