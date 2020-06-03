@@ -119,6 +119,7 @@ def main(inputTar,
     ######## HDD #######
     with tempfile.TemporaryDirectory() as tmpResFolder:
         runCofactors_hdd(rpcofactors, inputTar, tmpResFolder+'/tmpRes.tar', pathway_id, compartment_id)
+        #shutil.copyfile(tmpResFolder+'/tmpRes.tar', 'tmpRes.tar')
         ######## MEM #######
         #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
         ####### rpUnicity ######
