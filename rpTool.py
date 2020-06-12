@@ -242,8 +242,9 @@ class rpCofactors:
                 for species in reactants|products:
                     #check to make sure that they do not yet exist and if not create a new one
                     #TODO, replace the species with an existing one if it is contained in the MIRIAM annotations
-                    if not rpsbml.speciesExists(species, compartment_id):
-                        tmp_species = self._checkMNXMdeprecated(species)
+                    tmp_species = self._checkMNXMdeprecated(species)
+                    #neeed to test all the MIRIAM species comparison
+                    if not rpsbml.speciesExists(tmp_species, compartment_id):
                         xref = {}
                         inchi = None
                         inchikey = None
