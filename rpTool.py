@@ -1,11 +1,6 @@
 import copy
 import logging
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
-    datefmt='%d-%m-%Y %H:%M:%S',
-)
 
 ## Class to add the cofactors to a monocomponent reaction to construct the full reaction
 #
@@ -26,6 +21,33 @@ class rpCofactors:
         self.rr_full_reactions = None
         self.cid_xref = None
         self.rr_reactions = None
+
+
+    ################################################################
+    ######################## PRIVATE FUNCTIONS #####################
+    ################################################################
+
+
+    ## Function to create a dictionnary of old to new reaction id's
+    #
+    # TODO: check other things about the mnxm emtry like if it has the right structure etc...
+    def _checkMNXRdeprecated(self, mnxr):
+        try:
+            return self.deprecatedMNXR_mnxr[mnxr]
+        except KeyError:
+            return mnxr
+
+    ## Function to create a dictionnary of old to new chemical id's
+    #
+    #  Generate a one-to-one dictionnary of old id's to new ones. Private function
+    #
+    # TODO: check other things about the mnxm emtry like if it has the right structure etc...
+    def _checkMNXMdeprecated(self, mnxm):
+        try:
+            return self.deprecatedMNXM_mnxm[mnxm]
+        except KeyError:
+            return mnxm
+
 
     ################################################################
     ######################### PUBLIC FUNCTIONS #####################
@@ -169,11 +191,14 @@ class rpCofactors:
                 for species in reactants|products:
                     #check to make sure that they do not yet exist and if not create a new one
                     #TODO, replace the species with an existing one if it is contained in the MIRIAM annotations
-                    if not rpsbml.speciesExists(species, compartment_id):
+                    tmp_species = self._checkMNXMdeprecated(species)
+                    #neeed to test all the MIRIAM species comparison
+                    if not rpsbml.speciesExists(tmp_species, compartment_id):
                         xref = {}
                         inchi = None
                         inchikey = None
                         smiles = None
+                        chemName = None
                         try:
                             xref = self.cid_xref[species]
                         except KeyError:
@@ -213,30 +238,31 @@ class rpCofactors:
                         try:
                             chemName = self.cid_strc[species]['name']
                         except KeyError:
-                            chemName = None
-                        rpsbml.createSpecies(species,
-                                compartment_id,
-                                chemName,
-                                xref,
-                                inchi,
-                                inchikey,
-                                smiles)
+                            self.logger.warning('Cannot find the name for this species: '+str(tmp_species))
+                            pass
+                        rpsbml.createSpecies(tmp_species,
+                                             compartment_id,
+                                             chemName,
+                                             xref,
+                                             inchi,
+                                             inchikey,
+                                             smiles)
                 #add the new species to the RP reactions
                 reac = rpsbml.model.getReaction(rp_path[stepNum]['reaction_id'])
                 for pro in products:
                     prod = reac.createProduct()
-                    prod.setSpecies(str(pro)+'__64__'+str(compartment_id))
+                    prod.setSpecies(str(self._checkMNXMdeprecated(pro))+'__64__'+str(compartment_id))
                     prod.setConstant(True)
                     prod.setStoichiometry(rp_path[stepNum]['right'][pro])
                 for sub in reactants:
                     subs = reac.createReactant()
-                    subs.setSpecies(str(sub)+'__64__'+str(compartment_id))
+                    subs.setSpecies(str(self._checkMNXMdeprecated(sub))+'__64__'+str(compartment_id))
                     subs.setConstant(True)
                     subs.setStoichiometry(rp_path[stepNum]['left'][sub])
                 #replace the reaction rule with new one
                 rpsbml.addUpdateBRSynth(reac, 'smiles', rp_path[stepNum]['reaction_rule'], None, True)
             else:
                 #if the cofactors cannot be found delete it from the list
-                self.logger.warning('Cannot find cofactors... skipping') 
+                self.logger.warning('Cannot find cofactors... skipping')
                 return False
         return True

@@ -35,10 +35,10 @@ if __name__ == "__main__":
     elif params.input_format=='sbml':
         #make the tar.xz 
         with tempfile.TemporaryDirectory() as tmpOutputFolder:
-            inputTar = tmpOutputFolder+'/tmp_input.tar.xz'
-            outputTar = tmpOutputFolder+'/tmp_output.tar.xz'
-            with tarfile.open(inputTar, mode='w:xz') as tf:
-                info = tarfile.TarInfo('single.rpsbml.xml') #need to change the name since galaxy creates .dat files
+            inputTar = tmpOutputFolder+'/tmp_input.tar'
+            outputTar = tmpOutputFolder+'/tmp_output.tar'
+            with tarfile.open(inputTar, mode='w:gz') as tf:
+                info = tarfile.TarInfo('single.sbml.xml') #need to change the name since galaxy creates .dat files
                 info.size = os.path.getsize(params.input)
                 tf.addfile(tarinfo=info, fileobj=open(params.input, 'rb'))
             rpToolServe.main(inputTar,
@@ -47,7 +47,7 @@ if __name__ == "__main__":
                              params.compartment_id)
             with tarfile.open(outputTar) as outTar:
                 outTar.extractall(tmpOutputFolder)
-            out_file = glob.glob(tmpOutputFolder+'/*.rpsbml.xml')
+            out_file = glob.glob(tmpOutputFolder+'/*.sbml.xml')
             if len(out_file)>1:
                 logging.warning('There are more than one output file...')
             shutil.copy(out_file[0], params.output)
