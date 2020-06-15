@@ -122,51 +122,100 @@ class rpCofactors:
     # @param pathway_cmp_mnxm Dictionnary of intermediate compounds with their public ID's
     # @return Boolean determine if the step is to be added
     def addCofactors_step(self, step, pathway_cmp_mnxm):
+        self.logger.info(step)
         reac_smiles_left = step['reaction_rule'].split('>>')[0]
         reac_smiles_right = step['reaction_rule'].split('>>')[1]
         ori_reac_mnxr = self._checkMNXRdeprecated(step['rule_ori_reac']['mnxr'])
-        if self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']==-1:
-            isSuccess, reac_smiles_left = self.completeReac(step['right'],
-                                                            self.rr_reactions[step['rule_id']][ori_reac_mnxr]['left'],
-                                                            self.full_reactions[ori_reac_mnxr]['right'],
-                                                            True,
-                                                            reac_smiles_left,
-                                                            pathway_cmp_mnxm)
-            if not isSuccess:
-                self.logger.error('Could not recognise reaction rule for step '+str(step))
+        self.logger.info(ori_reac_mnxr)
+        self.logger.info(self.rr_reactions[step['rule_id']])
+        try:
+            if self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']==-1:
+                isSuccess, reac_smiles_left = self.completeReac(step['right'],
+                                                                self.rr_reactions[step['rule_id']][ori_reac_mnxr]['left'],
+                                                                self.full_reactions[ori_reac_mnxr]['right'],
+                                                                True,
+                                                                reac_smiles_left,
+                                                                pathway_cmp_mnxm)
+                if not isSuccess:
+                    self.logger.error('Could not recognise reaction rule for step '+str(step))
+                    return False
+                isSuccess, reac_smiles_right = self.completeReac(step['left'],
+                                                                 self.rr_reactions[step['rule_id']][ori_reac_mnxr]['right'],
+                                                                 self.full_reactions[ori_reac_mnxr]['left'],
+                                                                 False,
+                                                                 reac_smiles_right,
+                                                                 pathway_cmp_mnxm)
+                if not isSuccess:
+                    self.logger.error('Could not recognise reaction rule for step '+str(step))
+                    return False
+            elif self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']==1:
+                isSuccess, reac_smiles_left = self.completeReac(step['right'],
+                                                                self.rr_reactions[step['rule_id']][ori_reac_mnxr]['left'],
+                                                                self.full_reactions[ori_reac_mnxr]['left'],
+                                                                True,
+                                                                reac_smiles_left,
+                                                                pathway_cmp_mnxm)
+                if not isSuccess:
+                    self.logger.error('Could not recognise reaction rule for step '+str(step))
+                    return False
+                isSuccess, reac_smiles_right = self.completeReac(step['left'],
+                                                                 self.rr_reactions[step['rule_id']][ori_reac_mnxr]['right'],
+                                                                 self.full_reactions[ori_reac_mnxr]['right'],
+                                                                 False,
+                                                                 reac_smiles_right,
+                                                                 pathway_cmp_mnxm)
+                if not isSuccess:
+                    self.logger.error('Could not recognise reaction rule for step '+str(step))
+                    return False
+            else:
+                self.logger.error('Relative direction can only be 1 or -1: '+str(self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']))
                 return False
-            isSuccess, reac_smiles_right = self.completeReac(step['left'],
-                                                             self.rr_reactions[step['rule_id']][ori_reac_mnxr]['right'],
-                                                             self.full_reactions[ori_reac_mnxr]['left'],
-                                                             False,
-                                                             reac_smiles_right,
-                                                             pathway_cmp_mnxm)
-            if not isSuccess:
-                self.logger.error('Could not recognise reaction rule for step '+str(step))
+            step['reaction_rule'] = reac_smiles_left+'>>'+reac_smiles_right
+        except KeyError:
+            self.logger.warning('Reverting to the original MNXR')
+            ori_reac_mnxr = step['rule_ori_reac']['mnxr']
+            if self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']==-1:
+                isSuccess, reac_smiles_left = self.completeReac(step['right'],
+                                                                self.rr_reactions[step['rule_id']][ori_reac_mnxr]['left'],
+                                                                self.full_reactions[ori_reac_mnxr]['right'],
+                                                                True,
+                                                                reac_smiles_left,
+                                                                pathway_cmp_mnxm)
+                if not isSuccess:
+                    self.logger.error('Could not recognise reaction rule for step '+str(step))
+                    return False
+                isSuccess, reac_smiles_right = self.completeReac(step['left'],
+                                                                 self.rr_reactions[step['rule_id']][ori_reac_mnxr]['right'],
+                                                                 self.full_reactions[ori_reac_mnxr]['left'],
+                                                                 False,
+                                                                 reac_smiles_right,
+                                                                 pathway_cmp_mnxm)
+                if not isSuccess:
+                    self.logger.error('Could not recognise reaction rule for step '+str(step))
+                    return False
+            elif self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']==1:
+                isSuccess, reac_smiles_left = self.completeReac(step['right'],
+                                                                self.rr_reactions[step['rule_id']][ori_reac_mnxr]['left'],
+                                                                self.full_reactions[ori_reac_mnxr]['left'],
+                                                                True,
+                                                                reac_smiles_left,
+                                                                pathway_cmp_mnxm)
+                if not isSuccess:
+                    self.logger.error('Could not recognise reaction rule for step '+str(step))
+                    return False
+                isSuccess, reac_smiles_right = self.completeReac(step['left'],
+                                                                 self.rr_reactions[step['rule_id']][ori_reac_mnxr]['right'],
+                                                                 self.full_reactions[ori_reac_mnxr]['right'],
+                                                                 False,
+                                                                 reac_smiles_right,
+                                                                 pathway_cmp_mnxm)
+                if not isSuccess:
+                    self.logger.error('Could not recognise reaction rule for step '+str(step))
+                    return False
+            else:
+                self.logger.error('Relative direction can only be 1 or -1: '+str(self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']))
                 return False
-        elif self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']==1:
-            isSuccess, reac_smiles_left = self.completeReac(step['right'],
-                                                            self.rr_reactions[step['rule_id']][ori_reac_mnxr]['left'],
-                                                            self.full_reactions[ori_reac_mnxr]['left'],
-                                                            True,
-                                                            reac_smiles_left,
-                                                            pathway_cmp_mnxm)
-            if not isSuccess:
-                self.logger.error('Could not recognise reaction rule for step '+str(step))
-                return False
-            isSuccess, reac_smiles_right = self.completeReac(step['left'],
-                                                             self.rr_reactions[step['rule_id']][ori_reac_mnxr]['right'],
-                                                             self.full_reactions[ori_reac_mnxr]['right'],
-                                                             False,
-                                                             reac_smiles_right,
-                                                             pathway_cmp_mnxm)
-            if not isSuccess:
-                self.logger.error('Could not recognise reaction rule for step '+str(step))
-                return False
-        else:
-            self.logger.error('Relative direction can only be 1 or -1: '+str(self.rr_reactions[step['rule_id']][ori_reac_mnxr]['rel_direction']))
-            return False
-        step['reaction_rule'] = reac_smiles_left+'>>'+reac_smiles_right
+            step['reaction_rule'] = reac_smiles_left+'>>'+reac_smiles_right
         return True
 
 
@@ -193,8 +242,9 @@ class rpCofactors:
                 for species in reactants|products:
                     #check to make sure that they do not yet exist and if not create a new one
                     #TODO, replace the species with an existing one if it is contained in the MIRIAM annotations
-                    if not rpsbml.speciesExists(species, compartment_id):
-                        tmp_species = self._checkMNXMdeprecated(species)
+                    tmp_species = self._checkMNXMdeprecated(species)
+                    #neeed to test all the MIRIAM species comparison
+                    if not rpsbml.speciesExists(tmp_species, compartment_id):
                         xref = {}
                         inchi = None
                         inchikey = None
@@ -237,12 +287,12 @@ class rpCofactors:
                 reac = rpsbml.model.getReaction(rp_path[stepNum]['reaction_id'])
                 for pro in products:
                     prod = reac.createProduct()
-                    prod.setSpecies(str(pro)+'__64__'+str(compartment_id))
+                    prod.setSpecies(str(self._checkMNXMdeprecated(pro))+'__64__'+str(compartment_id))
                     prod.setConstant(True)
                     prod.setStoichiometry(rp_path[stepNum]['right'][pro])
                 for sub in reactants:
                     subs = reac.createReactant()
-                    subs.setSpecies(str(sub)+'__64__'+str(compartment_id))
+                    subs.setSpecies(str(self._checkMNXMdeprecated(sub))+'__64__'+str(compartment_id))
                     subs.setConstant(True)
                     subs.setStoichiometry(rp_path[stepNum]['left'][sub])
                 #replace the reaction rule with new one

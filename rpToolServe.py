@@ -23,6 +23,7 @@ sys.path.insert(0, '/home/')
 import rpTool as rpCofactors
 import rpToolCache
 import rpSBML
+import tool_rpUnicity
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -30,10 +31,8 @@ logging.basicConfig(
     datefmt='%d-%m-%Y %H:%M:%S',
 )
 
-'''
 logging.disable(logging.INFO)
 logging.disable(logging.WARNING)
-'''
 
 ## Run a single
 #
@@ -118,6 +117,10 @@ def main(inputTar,
     #pass the files to the rpReader
     #outputTar_bytes = io.BytesIO()
     ######## HDD #######
-    runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id, compartment_id)
-    ######## MEM #######
-    #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
+    with tempfile.TemporaryDirectory() as tmpResFolder:
+        runCofactors_hdd(rpcofactors, inputTar, tmpResFolder+'/tmpRes.tar', pathway_id, compartment_id)
+        #shutil.copyfile(tmpResFolder+'/tmpRes.tar', 'tmpRes.tar')
+        ######## MEM #######
+        #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
+        ####### rpUnicity ######
+        tool_rpUnicity.deduplicate(tmpResFolder+'/tmpRes.tar', outputTar)
