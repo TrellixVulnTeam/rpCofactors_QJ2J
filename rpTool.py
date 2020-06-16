@@ -30,23 +30,21 @@ class rpCofactors:
 
     ## Function to create a dictionnary of old to new reaction id's
     #
-    # TODO: check other things about the mnxm emtry like if it has the right structure etc...
-    def _checkMNXRdeprecated(self, mnxr):
+    def _checkRIDdeprecated(self, rid):
         try:
-            return self.deprecatedMNXR_mnxr[mnxr]
+            return self.deprecatedRID_rid[rid]
         except KeyError:
-            return mnxr
+            return rid
 
     ## Function to create a dictionnary of old to new chemical id's
     #
     #  Generate a one-to-one dictionnary of old id's to new ones. Private function
     #
-    # TODO: check other things about the mnxm emtry like if it has the right structure etc...
-    def _checkMNXMdeprecated(self, mnxm):
+    def _checkCIDdeprecated(self, cid):
         try:
-            return self.deprecatedMNXM_mnxm[mnxm]
+            return self.deprecatedCID_cid[cid]
         except KeyError:
-            return mnxm
+            return cid
 
 
     ################################################################
@@ -191,7 +189,7 @@ class rpCofactors:
                 for species in reactants|products:
                     #check to make sure that they do not yet exist and if not create a new one
                     #TODO, replace the species with an existing one if it is contained in the MIRIAM annotations
-                    tmp_species = self._checkMNXMdeprecated(species)
+                    tmp_species = self._checkCIDdeprecated(species)
                     #neeed to test all the MIRIAM species comparison
                     if not rpsbml.speciesExists(tmp_species, compartment_id):
                         xref = {}
@@ -200,43 +198,37 @@ class rpCofactors:
                         smiles = None
                         chemName = None
                         try:
-                            xref = self.cid_xref[species]
+                            xref = self.cid_xref[tmp_species]
                         except KeyError:
                             try:
-                                xref = self.cid_xref[self.deprecatedCID_cid[species]]
+                                xref = self.cid_xref[tmp_species]
                             except KeyError:
                                 #TODO: although there should not be any
                                 #intermediate species here consider
                                 #removing this warning
-                                self.logger.warning('Cannot find the xref for this species: '+str(species))
+                                self.logger.warning('Cannot find the xref for this species: '+str(tmp_species))
                                 pass
                         try:
-                            inchi = self.cid_strc[species]['inchi']
+                            inchi = self.cid_strc[tmp_species]['inchi']
                         except KeyError:
                             try:
-                                inchi = self.cid_strc[self.deprecatedCID_cid[species]]['inchi']
+                                inchi = self.cid_strc[tmp_species]['inchi']
                             except KeyError:
-                                self.logger.warning('Cannot find the inchi for this species: '+str(species))
+                                self.logger.warning('Cannot find the inchi for this species: '+str(tmp_species))
                                 pass
                         try:
-                            inchikey = self.cid_strc[species]['inchikey']
+                            inchikey = self.cid_strc[tmp_species]['inchikey']
                         except KeyError:
-                            try:
-                                inchikey = self.cid_strc[self.deprecatedCID_cid[species]]['inchikey']
-                            except KeyError:
-                                self.logger.warning('Cannot find the inchikey for this species: '+str(species))
-                                pass
+                            self.logger.warning('Cannot find the inchikey for this species: '+str(tmp_species))
+                            pass
                         try:
-                            smiles = self.cid_strc[species]['smiles']
+                            smiles = self.cid_strc[tmp_species]['smiles']
                         except KeyError:
-                            try:
-                                smiles = self.cid_strc[self.deprecatedCID_cid[species]]['smiles']
-                            except KeyError:
-                                self.logger.warning('Cannot find the smiles for this species: '+str(species))
-                                pass
+                            self.logger.warning('Cannot find the smiles for this species: '+str(tmp_species))
+                            pass
                         #add the new species to rpsbml
                         try:
-                            chemName = self.cid_strc[species]['name']
+                            chemName = self.cid_strc[tmp_species]['name']
                         except KeyError:
                             self.logger.warning('Cannot find the name for this species: '+str(tmp_species))
                             pass
