@@ -243,12 +243,12 @@ class rpCofactors:
                 reac = rpsbml.model.getReaction(rp_path[stepNum]['reaction_id'])
                 for pro in products:
                     prod = reac.createProduct()
-                    prod.setSpecies(str(self._checkMNXMdeprecated(pro))+'__64__'+str(compartment_id))
+                    prod.setSpecies(str(self._checkCIDdeprecated(pro))+'__64__'+str(compartment_id))
                     prod.setConstant(True)
                     prod.setStoichiometry(rp_path[stepNum]['right'][pro])
                 for sub in reactants:
                     subs = reac.createReactant()
-                    subs.setSpecies(str(self._checkMNXMdeprecated(sub))+'__64__'+str(compartment_id))
+                    subs.setSpecies(str(self._checkCIDdeprecated(sub))+'__64__'+str(compartment_id))
                     subs.setConstant(True)
                     subs.setStoichiometry(rp_path[stepNum]['left'][sub])
                 #replace the reaction rule with new one
