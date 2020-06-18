@@ -17,7 +17,7 @@ import docker
 ##
 #
 #
-def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_id='MNXC3'):
+def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_id='MNXC3', pubchem_search='False'):
     docker_client = docker.from_env()
     image_str = 'brsynth/rpcofactors-standalone:newrules'
     try:
@@ -42,18 +42,23 @@ def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_i
                    '-pathway_id',
                    pathway_id,
                    '-compartment_id',
-                   compartment_id]
+                   compartment_id,
+                   '-pubchem_search',
+                   pubchem_search]
         container = docker_client.containers.run(image_str, 
                                                  command, 
                                                  detach=True, 
                                                  stderr=True,
                                                  volumes={tmpOutputFolder+'/': {'bind': '/home/tmp_output', 'mode': 'rw'}})
         container.wait()
-        err = container.logs(stdout=False, stderr=True)
+        err = container.logs(stdout=True, stderr=True)
         err_str = err.decode('utf-8')
+        print(err_str)
         if not 'ERROR' in err_str:
             shutil.copy(tmpOutputFolder+'/output.dat', output)
             logging.info('\n'+err_str)
+        else:
+            print(err_str)
         container.remove()
 
 
@@ -67,5 +72,6 @@ if __name__ == "__main__":
     parser.add_argument('-input_format', type=str)
     parser.add_argument('-pathway_id', type=str, default='rp_pathway')
     parser.add_argument('-compartment_id', type=str, default='MNXC3')
+    parser.add_argument('-pubchem_search', type=str, default='False')
     params = parser.parse_args()
     main(params.input, params.input_format, params.output, params.pathway_id, params.compartment_id)

@@ -11,6 +11,7 @@ import tarfile
 import tempfile
 import glob
 import os
+import logging
 import sys
 sys.path.insert(0, '/home/')
 
@@ -26,12 +27,21 @@ if __name__ == "__main__":
     parser.add_argument('-input_format', type=str)
     parser.add_argument('-pathway_id', type=str, default='rp_pathway')
     parser.add_argument('-compartment_id', type=str, default='MNXC3')
+    parser.add_argument('-pubchem_search', type=str, default='False')
     params = parser.parse_args()
+    if params.pubchem_search=='True' or params.pubchem_search=='T' or params.pubchem_search=='true' or params.pubchem_search=='t':
+        pubchem_search = True
+    elif params.pubchem_search=='False' or params.pubchem_search=='F' or params.pubchem_search=='false' or params.pubchem_search=='f':
+        pubchem_search = False
+    else:
+        logging.error('Cannot interpret pubchem_search input: '+str(params.pubchem_search))
+        exit(1)
     if params.input_format=='tar':
         rpToolServe.main(params.input,
                          params.output,
                          params.pathway_id,
-                         params.compartment_id)
+                         params.compartment_id,
+                         pubchem_search)
     elif params.input_format=='sbml':
         #make the tar.xz 
         with tempfile.TemporaryDirectory() as tmpOutputFolder:
@@ -44,7 +54,8 @@ if __name__ == "__main__":
             rpToolServe.main(inputTar,
                              outputTar,
                              params.pathway_id,
-                             params.compartment_id)
+                             params.compartment_id,
+                             pubchem_search)
             with tarfile.open(outputTar) as outTar:
                 outTar.extractall(tmpOutputFolder)
             out_file = glob.glob(tmpOutputFolder+'/*.sbml.xml')
