@@ -299,6 +299,9 @@ class rpCofactors:
         for stepNum in sorted(list(rp_path), reverse=True):
         #for stepNum in sorted(list(rp_path)):
             if self.addCofactors_step(rp_path[stepNum], pathway_cmp):
+                self.logger.debug('________ '+str(rp_path[stepNum]['reaction_id'])+' ___________')
+                self.logger.debug(rp_path[stepNum]['left'])
+                self.logger.debug(rp_path[stepNum]['right'])
                 ###add the new cofactors to the SBML
                 #remove the original species from the monocomponent reaction
                 reactants = set(set(rp_path[stepNum]['left'].keys())-set(ori_rp_path[stepNum]['left'].keys()))
@@ -498,25 +501,41 @@ class rpCofactors:
                                              inchikey,
                                              smiles) 
                 #add the new species to the RP reactions
+                #TODO: need to updpate the stochio
                 reac = rpsbml.model.getReaction(rp_path[stepNum]['reaction_id'])
+                self.logger.debug(spe_conv)
+                pre_reactants = [i.species for i in reac.getListOfReactants()]
+                pre_products = [i.species for i in reac.getListOfProducts()]
+                self.logger.debug(pre_reactants)
+                self.logger.debug(reactants)
+                self.logger.debug(pre_products)
+                self.logger.debug(products)
                 for pro in products:
-                    prod = reac.createProduct()
                     if self._checkCIDdeprecated(pro) in spe_conv:
                         toadd = spe_conv[self._checkCIDdeprecated(pro)]
                     else:
                         toadd = str(self._checkCIDdeprecated(pro))+'__64__'+str(compartment_id)
                     #prod.setSpecies(str(self._checkCIDdeprecated(pro))+'__64__'+str(compartment_id))
+                    if toadd in pre_products:
+                        continue
+                    self.logger.debug(str(toadd)+': '+str(rpsbml.speciesExists(toadd.split('__')[0], compartment_id)))
+                    self.logger.debug('+++ creating product: '+str(toadd)+' stochio: '+str(rp_path[stepNum]['right'][pro]))
+                    prod = reac.createProduct()
                     prod.setSpecies(toadd)
                     prod.setConstant(True)
                     prod.setStoichiometry(rp_path[stepNum]['right'][pro])
                 for sub in reactants:
-                    subs = reac.createReactant()
                     if self._checkCIDdeprecated(sub) in spe_conv:
                         toadd = spe_conv[self._checkCIDdeprecated(sub)]
                     else:
-                        toadd = str(self._checkCIDdeprecated(pro))+'__64__'+str(compartment_id)
+                        toadd = str(self._checkCIDdeprecated(sub))+'__64__'+str(compartment_id)
                     #prod.setSpecies(str(self._checkCIDdeprecated(sub))+'__64__'+str(compartment_id))
-                    prod.setSpecies(toadd)
+                    if toadd in pre_reactants:
+                        continue
+                    self.logger.debug(str(toadd)+': '+str(rpsbml.speciesExists(toadd.split('__')[0], compartment_id)))
+                    self.logger.debug('+++ creating substrate: '+str(toadd)+' stochio: '+str(rp_path[stepNum]['left'][sub]))
+                    subs = reac.createReactant()
+                    subs.setSpecies(toadd)
                     subs.setConstant(True)
                     subs.setStoichiometry(rp_path[stepNum]['left'][sub])
                 #replace the reaction rule with new one

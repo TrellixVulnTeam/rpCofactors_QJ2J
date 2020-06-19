@@ -32,6 +32,7 @@ logging.basicConfig(
     datefmt='%d-%m-%Y %H:%M:%S',
 )
 
+logging.getLogger().setLevel(logging.DEBUG)
 
 ## Run a single
 #
