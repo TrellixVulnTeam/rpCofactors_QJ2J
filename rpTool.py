@@ -236,42 +236,58 @@ class rpCofactors:
         reac_smiles_left = step['reaction_rule'].split('>>')[0]
         reac_smiles_right = step['reaction_rule'].split('>>')[1]
         if self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['rel_direction']==-1:
-            isSuccess, reac_smiles_left = self.completeReac(step['right'],
-                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['left'],
-                    self.rr_full_reactions[step['rule_ori_reac']]['right'],
-                    True,
-                    reac_smiles_left,
-                    pathway_cmp)
-            if not isSuccess:
-                self.logger.error('Could not recognise reaction rule for step '+str(step))
+            try:
+                isSuccess, reac_smiles_left = self.completeReac(step['right'],
+                        self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['left'],
+                        self.rr_full_reactions[step['rule_ori_reac']]['right'],
+                        True,
+                        reac_smiles_left,
+                        pathway_cmp)
+                if not isSuccess:
+                    self.logger.warning('Could not recognise reaction rule for step (1): '+str(step))
+                    return False
+            except KeyError:
+                self.logger.warning('Could not find the full reaction for reaction (1): '+str(step['rule_ori_reac']))
                 return False
-            isSuccess, reac_smiles_right = self.completeReac(step['left'],
-                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['right'],
-                    self.rr_full_reactions[step['rule_ori_reac']]['left'],
-                    False,
-                    reac_smiles_right,
-                    pathway_cmp)
-            if not isSuccess:
-                self.logger.error('Could not recognise reaction rule for step '+str(step))
+            try:
+                isSuccess, reac_smiles_right = self.completeReac(step['left'],
+                        self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['right'],
+                        self.rr_full_reactions[step['rule_ori_reac']]['left'],
+                        False,
+                        reac_smiles_right,
+                        pathway_cmp)
+                if not isSuccess:
+                    self.logger.warning('Could not recognise reaction rule for step (2): '+str(step))
+                    return False
+            except KeyError:
+                self.logger.warning('Could not find the full reaction for reaction (2): '+str(step['rule_ori_reac']))
                 return False
         elif self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['rel_direction']==1:
-            isSuccess, reac_smiles_left = self.completeReac(step['right'],
-                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['left'],
-                    self.rr_full_reactions[step['rule_ori_reac']]['left'],
-                    True,
-                    reac_smiles_left,
-                    pathway_cmp)
-            if not isSuccess:
-                self.logger.error('Could not recognise reaction rule for step '+str(step))
+            try:
+                isSuccess, reac_smiles_left = self.completeReac(step['right'],
+                        self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['left'],
+                        self.rr_full_reactions[step['rule_ori_reac']]['left'],
+                        True,
+                        reac_smiles_left,
+                        pathway_cmp)
+                if not isSuccess:
+                    self.logger.error('Could not recognise reaction rule for step (3): '+str(step))
+                    return False
+            except KeyError:
+                self.logger.warning('Could not find the full reaction for reaction (3): '+str(step['rule_ori_reac']))
                 return False
-            isSuccess, reac_smiles_right = self.completeReac(step['left'],
-                    self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['right'],
-                    self.rr_full_reactions[step['rule_ori_reac']]['right'],
-                    False,
-                    reac_smiles_right,
-                    pathway_cmp)
-            if not isSuccess:
-                self.logger.error('Could not recognise reaction rule for step '+str(step))
+            try:
+                isSuccess, reac_smiles_right = self.completeReac(step['left'],
+                        self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['right'],
+                        self.rr_full_reactions[step['rule_ori_reac']]['right'],
+                        False,
+                        reac_smiles_right,
+                        pathway_cmp)
+                if not isSuccess:
+                    self.logger.error('Could not recognise reaction rule for step '+str(step))
+                    return False
+            except KeyError:
+                self.logger.warning('Could not find the full reaction for reaction (4): '+str(step['rule_ori_reac']))
                 return False
         else:
             self.logger.error('Relative direction can only be 1 or -1: '+str(self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['rel_direction']))
