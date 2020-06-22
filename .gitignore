@@ -1,4 +1,6 @@
 input_cache/
+galaxy/img/.DS_Store
+OLD/
 cache/
 test/
 *.swp

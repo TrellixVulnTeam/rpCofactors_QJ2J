@@ -74,4 +74,4 @@ if __name__ == "__main__":
     parser.add_argument('-compartment_id', type=str, default='MNXC3')
     parser.add_argument('-pubchem_search', type=str, default='False')
     params = parser.parse_args()
-    main(params.input, params.input_format, params.output, params.pathway_id, params.compartment_id)
+    main(params.input, params.input_format, params.output, params.pathway_id, params.compartment_id, params.pubchem_search)
