@@ -6,4 +6,4 @@ RUN mv rpUnicity/code/tool_rpUnicity.py .
 RUN rm -r rpUnicity
 COPY rpTool.py /home/
 COPY rpToolServe.py /home/
-COPY tool_rpCofactors.py /home/
+COPY galaxy/tool_rpCofactors.py /home/
