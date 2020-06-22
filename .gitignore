@@ -1,4 +1,7 @@
 input_cache/
+galaxy/img/.DS_Store
+OLD/
+tool_rpUnicity.py
 cache/
 test/
 *.swp
