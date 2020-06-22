@@ -21,26 +21,26 @@ import shutil
 
 sys.path.insert(0, '/home/')
 import rpTool as rpCofactors
-import rpToolCache
+import rpCache
 import rpSBML
 import tool_rpUnicity
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    #level=logging.DEBUG,
+    level=logging.WARNING,
     format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
     datefmt='%d-%m-%Y %H:%M:%S',
 )
 
-logging.disable(logging.INFO)
-logging.disable(logging.WARNING)
+#logging.getLogger().setLevel(logging.DEBUG)
 
 ## Run a single
 #
 #
-def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartment_id):
+def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartment_id, pubchem_search):
     #open one of the rp SBML files
     rpsbml = rpSBML.rpSBML(member_name, libsbml.readSBMLFromString(rpsbml_string))
-    if rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id):
+    if rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id, pubchem_search):
         return libsbml.writeSBMLToString(rpsbml.document).encode('utf-8')
     else:
         return ''
@@ -49,7 +49,7 @@ def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartme
 ##
 #
 #
-def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
+def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3', pubchem_search=False):
     #loop through all of them and run FBA on them
     with tarfile.open(fileobj=outputTar, mode='w:gz') as tf:
         with tarfile.open(fileobj=inputTar, mode='r') as in_tf:
@@ -70,7 +70,7 @@ def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
 ## run using HDD 3X less than the above function
 #
 #
-def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
+def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3', pubchem_search=False):
     with tempfile.TemporaryDirectory() as tmpOutputFolder:
         with tempfile.TemporaryDirectory() as tmpInputFolder:
             tar = tarfile.open(inputTar, mode='r')
@@ -81,6 +81,7 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
                 return False
             for sbml_path in glob.glob(tmpInputFolder+'/*'):
                 fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '').replace('.rpsbml', '')
+                logging.debug('============= '+str(fileName)+' ============')
                 rpsbml = rpSBML.rpSBML(fileName)
                 rpsbml.readSBML(sbml_path)
                 rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id)
@@ -105,20 +106,25 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
 def main(inputTar,
          outputTar,
          pathway_id,
-         compartment_id):
-    rpcache = rpToolCache.rpToolCache()
+         compartment_id,
+         pubchem_search):
+    rpcache = rpCache.rpCache()
     rpcofactors = rpCofactors.rpCofactors()
-    rpcofactors.deprecatedMNXM_mnxm = rpcache.deprecatedMNXM_mnxm
-    rpcofactors.deprecatedMNXR_mnxr = rpcache.deprecatedMNXR_mnxr
-    rpcofactors.mnxm_strc = rpcache.mnxm_strc
-    rpcofactors.full_reactions = rpcache.full_reactions
-    rpcofactors.chemXref = rpcache.chemXref
-    rpcofactors.rr_reactions = rpcache.rr_reactions
-    #pass the files to the rpReader
+    rpcofactors.rr_full_reactions = rpcache.getFullReactions()
+    rpcofactors.deprecatedCID_cid = rpcache.getDeprecatedCID()
+    rpcofactors.deprecatedRID_rid = rpcache.getDeprecatedRID()
+    rpcofactors.cid_strc = rpcache.getCIDstrc()
+    rpcofactors.inchikey_cid = rpcache.getInchiKeyCID()
+    rpcofactors.rr_reactions = rpcache.getRRreactions()
+    rpcofactors.cid_xref = rpcache.getCIDxref()
+    rpcofactors.xref_comp, rpcofactors.comp_xref = rpcache.getCompXref()
+    rpcofactors.chebi_cid = rpcache.getChebiCID()
+    rpcofactors.cid_name = rpcache.getCIDname()
     #outputTar_bytes = io.BytesIO()
     ######## HDD #######
     with tempfile.TemporaryDirectory() as tmpResFolder:
-        runCofactors_hdd(rpcofactors, inputTar, tmpResFolder+'/tmpRes.tar', pathway_id, compartment_id)
+        runCofactors_hdd(rpcofactors, inputTar, tmpResFolder+'/tmpRes.tar', pathway_id, compartment_id, pubchem_search)
+        #shutil.copyfile(tmpResFolder+'/tmpRes.tar', outputTar)
         #shutil.copyfile(tmpResFolder+'/tmpRes.tar', 'tmpRes.tar')
         ######## MEM #######
         #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
