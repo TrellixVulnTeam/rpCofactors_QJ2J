@@ -28,7 +28,7 @@ Advanced Options:
 To build the docker locally, run the following command in the project directory: 
 
 ```
-docker build -t brsynth/rpcofactors-standalone:newrules .
+docker build -t brsynth/rpcofactors-standalone:dev .
 ```
 
 ## Running the test

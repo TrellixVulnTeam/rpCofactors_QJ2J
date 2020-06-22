@@ -247,7 +247,7 @@ class rpCofactors:
                     self.logger.warning('Could not recognise reaction rule for step (1): '+str(step))
                     return False
             except KeyError:
-                self.logger.warning('Could not find the full reaction for reaction (1): '+str(step['rule_ori_reac']))
+                self.logger.warning('Could not find the full reaction for reaction (1): '+str(step))
                 return False
             try:
                 isSuccess, reac_smiles_right = self.completeReac(step['left'],
@@ -260,7 +260,7 @@ class rpCofactors:
                     self.logger.warning('Could not recognise reaction rule for step (2): '+str(step))
                     return False
             except KeyError:
-                self.logger.warning('Could not find the full reaction for reaction (2): '+str(step['rule_ori_reac']))
+                self.logger.warning('Could not find the full reaction for reaction (2): '+str(step))
                 return False
         elif self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['rel_direction']==1:
             try:
@@ -274,7 +274,7 @@ class rpCofactors:
                     self.logger.error('Could not recognise reaction rule for step (3): '+str(step))
                     return False
             except KeyError:
-                self.logger.warning('Could not find the full reaction for reaction (3): '+str(step['rule_ori_reac']))
+                self.logger.warning('Could not find the full reaction for reaction (3): '+str(step))
                 return False
             try:
                 isSuccess, reac_smiles_right = self.completeReac(step['left'],
@@ -287,7 +287,7 @@ class rpCofactors:
                     self.logger.error('Could not recognise reaction rule for step '+str(step))
                     return False
             except KeyError:
-                self.logger.warning('Could not find the full reaction for reaction (4): '+str(step['rule_ori_reac']))
+                self.logger.warning('Could not find the full reaction for reaction (4): '+str(step))
                 return False
         else:
             self.logger.error('Relative direction can only be 1 or -1: '+str(self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['rel_direction']))

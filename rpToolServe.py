@@ -26,13 +26,13 @@ import rpSBML
 import tool_rpUnicity
 
 logging.basicConfig(
-    level=logging.DEBUG,
-    #level=logging.WARNING,
+    #level=logging.DEBUG,
+    level=logging.WARNING,
     format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
     datefmt='%d-%m-%Y %H:%M:%S',
 )
 
-logging.getLogger().setLevel(logging.DEBUG)
+#logging.getLogger().setLevel(logging.DEBUG)
 
 ## Run a single
 #
@@ -110,15 +110,16 @@ def main(inputTar,
          pubchem_search):
     rpcache = rpCache.rpCache()
     rpcofactors = rpCofactors.rpCofactors()
-    rpcofactors.deprecatedCID_cid = rpcache.deprecatedCID_cid
-    rpcofactors.deprecatedRID_rid = rpcache.deprecatedRID_rid
-    rpcofactors.cid_strc = rpcache.cid_strc
-    rpcofactors.rr_full_reactions = rpcache.rr_full_reactions
-    rpcofactors.cid_xref = rpcache.cid_xref
-    rpcofactors.rr_reactions = rpcache.rr_reactions
-    rpcofactors.cid_name = rpcache.cid_name
-    rpcofactors.inchikey_cid = rpcache.inchikey_cid
-    rpcofactors.cid_name = rpcache.cid_name
+    rpcofactors.rr_full_reactions = rpcache.getFullReactions()
+    rpcofactors.deprecatedCID_cid = rpcache.getDeprecatedCID()
+    rpcofactors.deprecatedRID_rid = rpcache.getDeprecatedRID()
+    rpcofactors.cid_strc = rpcache.getCIDstrc()
+    rpcofactors.inchikey_cid = rpcache.getInchiKeyCID()
+    rpcofactors.rr_reactions = rpcache.getRRreactions()
+    rpcofactors.cid_xref = rpcache.getCIDxref()
+    rpcofactors.xref_comp, rpcofactors.comp_xref = rpcache.getCompXref()
+    rpcofactors.chebi_cid = rpcache.getChebiCID()
+    rpcofactors.cid_name = rpcache.getCIDname()
     #outputTar_bytes = io.BytesIO()
     ######## HDD #######
     with tempfile.TemporaryDirectory() as tmpResFolder:

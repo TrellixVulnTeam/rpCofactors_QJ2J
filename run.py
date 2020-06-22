@@ -19,7 +19,7 @@ import docker
 #
 def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_id='MNXC3', pubchem_search='False'):
     docker_client = docker.from_env()
-    image_str = 'brsynth/rpcofactors-standalone:newrules'
+    image_str = 'brsynth/rpcofactors-standalone:dev'
     try:
         image = docker_client.images.get(image_str)
     except docker.errors.ImageNotFound:
@@ -38,13 +38,13 @@ def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_i
                    '-output',
                    '/home/tmp_output/output.dat',
                    '-input_format',
-                   input_format,
+                   str(input_format),
                    '-pathway_id',
-                   pathway_id,
+                   str(pathway_id),
                    '-compartment_id',
-                   compartment_id,
+                   str(compartment_id),
                    '-pubchem_search',
-                   pubchem_search]
+                   str(pubchem_search)]
         container = docker_client.containers.run(image_str, 
                                                  command, 
                                                  detach=True, 
