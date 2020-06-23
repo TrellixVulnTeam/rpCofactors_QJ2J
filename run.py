@@ -53,7 +53,6 @@ def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_i
         container.wait()
         err = container.logs(stdout=True, stderr=True)
         err_str = err.decode('utf-8')
-        print(err_str)
         if not 'ERROR' in err_str:
             shutil.copy(tmpOutputFolder+'/output.dat', output)
             logging.info('\n'+err_str)
