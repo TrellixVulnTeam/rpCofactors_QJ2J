@@ -10,6 +10,7 @@ Created on September 21 2019
 import os
 import json
 import libsbml
+import copy
 import logging
 import io
 import tarfile
@@ -27,7 +28,8 @@ import tool_rpUnicity
 
 logging.basicConfig(
     #level=logging.DEBUG,
-    level=logging.WARNING,
+    #level=logging.WARNING,
+    level=logging.ERROR,
     format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
     datefmt='%d-%m-%Y %H:%M:%S',
 )
@@ -105,9 +107,9 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
 #
 def main(inputTar,
          outputTar,
-         pathway_id,
-         compartment_id,
-         pubchem_search):
+         pathway_id='rp_pathway',
+         compartment_id='MNXC3',
+         pubchem_search=False):
     rpcache = rpCache.rpCache()
     rpcofactors = rpCofactors.rpCofactors()
     rpcofactors.rr_full_reactions = rpcache.getFullReactions()
@@ -130,3 +132,58 @@ def main(inputTar,
         #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
         ####### rpUnicity ######
         tool_rpUnicity.deduplicate(tmpResFolder+'/tmpRes.tar', outputTar)
+
+##
+#
+#
+def main_extrules(inputTar,
+                  outputTar,
+                  rxn_recipes,
+                  rules_rall_tsv,
+                  compounds_tsv,
+                  pathway_id='rp_pathway',
+                  compartment_id='MNXC3',
+                  pubchem_search=False):
+    rpcache = rpCache.rpCache()
+    rpcofactors = rpCofactors.rpCofactors()
+    #### parse the input files and merge with cache ####
+    ''' if you want to merge
+    rpcache.retroRulesFullReac(rxn_recipes)
+    new_full_reactions = copy.deepcopy(rpcache.rr_full_reactions)
+    rpcache.rr_full_reactions = {**rpcache.getFullReactions(), **new_full_reactions}
+    rpcofactors.rr_full_reactions = rpcache.rr_full_reactions
+    #reaction rules
+    rpcache.retroReactions(rules_rall_tsv)
+    new_rr_reactions = copy.deepcopy(rpcache.rr_reactions)
+    rpreader.rr_reactions = {**rpcache.getRRreactions(), **new_rr_reactions}
+    '''
+    #if you want to overwite
+    rpcache.retroRulesFullReac(rxn_recipes)
+    rpcofactors.rr_full_reactions = rpcache.rr_full_reactions
+    rpcache.retroRulesStrc(compounds_tsv)
+    new_cid_strc = copy.deepcopy(rpcache.cid_strc)
+    rpcache.cid_strc = {**rpcache.getCIDstrc(), **new_cid_strc}
+    rpcache._inchikeyCID()
+    rpcofactors.cid_strc = rpcache.cid_strc
+    rpcofactors.inchikey_cid = rpcache.inchikey_cid
+    #reaction rules
+    rpcache.retroReactions(rules_rall_tsv)
+    rpcofactors.rr_reactions = rpcache.rr_reactions
+    ##
+    rpcofactors.deprecatedCID_cid = rpcache.getDeprecatedCID()
+    rpcofactors.deprecatedRID_rid = rpcache.getDeprecatedRID()
+    rpcofactors.cid_xref = rpcache.getCIDxref()
+    rpcofactors.xref_comp, rpcofactors.comp_xref = rpcache.getCompXref()
+    rpcofactors.chebi_cid = rpcache.getChebiCID()
+    rpcofactors.cid_name = rpcache.getCIDname()
+    #outputTar_bytes = io.BytesIO()
+    ######## HDD #######
+    with tempfile.TemporaryDirectory() as tmpResFolder:
+        runCofactors_hdd(rpcofactors, inputTar, tmpResFolder+'/tmpRes.tar', pathway_id, compartment_id, pubchem_search)
+        #shutil.copyfile(tmpResFolder+'/tmpRes.tar', outputTar)
+        #shutil.copyfile(tmpResFolder+'/tmpRes.tar', 'tmpRes.tar')
+        ######## MEM #######
+        #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
+        ####### rpUnicity ######
+        tool_rpUnicity.deduplicate(tmpResFolder+'/tmpRes.tar', outputTar)
+
