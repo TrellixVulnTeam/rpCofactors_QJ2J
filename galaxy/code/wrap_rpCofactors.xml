@@ -24,9 +24,9 @@
 			</when>
 		</conditional>
 		<section name="adv" title="Advanced Options" expanded="false">
-      <param name="rules_rall" type="data" optional="true" multiple="false" format="tsv" label="Reaction rule files" />
-      <param name="compounds" type="data" optional="true" multiple="false" format="tsv" label="List of compounds contained in reaction rules" />
-			<param name="rxn_recipes" type="data" optional="true" multiple="false" format="tsv" label="Reaction rule reaction recipes" />
+      <param name="rules_rall" type="data" optional="true" multiple="false" format="tsv" label="Reaction Rules" />
+      <param name="compounds" type="data" optional="true" multiple="false" format="tsv" label="Reaction Rules Compounds" />
+			<param name="rxn_recipes" type="data" optional="true" multiple="false" format="tsv" label="Reaction Rules Recipes" />
 			<param name="pathway_id" type="text" value="rp_pathway" label="SBML heterologous pathway ID" />
 			<param name="compartment_id" type="text" value="MNXC3" label="SBML compartment ID" />
 		</section>
