@@ -17,9 +17,17 @@ import docker
 ##
 #
 #
-def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_id='MNXC3', pubchem_search='False'):
+def main(inputfile,
+         input_format,
+         rxn_recipes,
+         rules_rall,
+         compounds,
+         output,
+         pathway_id='rp_pathway',
+         compartment_id='MNXC3',
+         pubchem_search='False'):
     docker_client = docker.from_env()
-    image_str = 'brsynth/rpcofactors-standalone'
+    image_str = 'brsynth/rpcofactors-standalone:extrules'
     try:
         image = docker_client.images.get(image_str)
     except docker.errors.ImageNotFound:
@@ -37,6 +45,12 @@ def main(inputfile, input_format, output, pathway_id='rp_pathway', compartment_i
                    '/home/tmp_output/input.dat',
                    '-output',
                    '/home/tmp_output/output.dat',
+                   '-rxn_recipes',
+                   str(rxn_recipes),
+                   '-rules_rall',
+                   str(rules_rall),
+                   '-compounds',
+                   str(compounds),
                    '-input_format',
                    str(input_format),
                    '-pathway_id',
@@ -69,8 +83,19 @@ if __name__ == "__main__":
     parser.add_argument('-input', type=str)
     parser.add_argument('-output', type=str)
     parser.add_argument('-input_format', type=str)
+    parser.add_argument('-rxn_recipes', type=str, default='None')
+    parser.add_argument('-rules_rall', type=str, default='None')
+    parser.add_argument('-compounds', type=str, default='None')
     parser.add_argument('-pathway_id', type=str, default='rp_pathway')
     parser.add_argument('-compartment_id', type=str, default='MNXC3')
     parser.add_argument('-pubchem_search', type=str, default='False')
     params = parser.parse_args()
-    main(params.input, params.input_format, params.output, params.pathway_id, params.compartment_id, params.pubchem_search)
+    main(params.input,
+         params.input_format,
+         params.rxn_recipes,
+         params.rules_rall,
+         params.compounds,
+         params.output,
+         params.pathway_id,
+         params.compartment_id,
+         params.pubchem_search)
