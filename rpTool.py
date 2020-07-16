@@ -518,6 +518,7 @@ class rpCofactors:
                                              smiles) 
                 #add the new species to the RP reactions
                 #TODO: need to updpate the stochio
+                self.logger.debug(rp_path[stepNum]['reaction_id'])
                 reac = rpsbml.model.getReaction(rp_path[stepNum]['reaction_id'])
                 self.logger.debug(spe_conv)
                 pre_reactants = [i.species for i in reac.getListOfReactants()]
@@ -555,6 +556,8 @@ class rpCofactors:
                     subs.setConstant(True)
                     subs.setStoichiometry(rp_path[stepNum]['left'][sub])
                 #replace the reaction rule with new one
+                self.logger.debug(reac)
+                self.logger.debug(rp_path[stepNum]['reaction_rule'])
                 rpsbml.addUpdateBRSynth(reac, 'smiles', rp_path[stepNum]['reaction_rule'], None, True)
             else:
                 #if the cofactors cannot be found delete it from the list
