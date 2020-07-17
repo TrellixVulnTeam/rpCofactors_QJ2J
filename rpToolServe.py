@@ -21,7 +21,7 @@ import shutil
 
 sys.path.insert(0, '/home/')
 import rpTool as rpCofactors
-import rpToolCache
+import rpCache
 import rpSBML
 import tool_rpUnicity
 
@@ -105,8 +105,20 @@ def main(inputTar,
          outputTar,
          pathway_id,
          compartment_id):
-    rpcache = rpToolCache.rpToolCache()
     rpcofactors = rpCofactors.rpCofactors()
+    rpcache = rpCache.rpCache()
+
+        rpreader.deprecatedCID_cid = rpcache.getDeprecatedCID()
+        rpreader.deprecatedRID_rid = rpcache.getDeprecatedRID()
+        rpreader.cid_strc = rpcache.getCIDstrc()
+        rpreader.inchikey_cid = rpcache.getInchiKeyCID()
+        rpreader.rr_reactions = rpcache.getRRreactions()
+        rpreader.cid_xref = rpcache.getCIDxref()
+        rpreader.xref_comp, rpreader.comp_xref = rpcache.getCompXref()
+        rpreader.chebi_cid = rpcache.getChebiCID()
+        rpreader.cid_name = rpcache.getCIDname()
+
+
     rpcofactors.deprecatedMNXM_mnxm = rpcache.deprecatedMNXM_mnxm
     rpcofactors.deprecatedMNXR_mnxr = rpcache.deprecatedMNXR_mnxr
     rpcofactors.mnxm_strc = rpcache.mnxm_strc
