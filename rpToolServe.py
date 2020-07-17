@@ -10,6 +10,7 @@ Created on September 21 2019
 import os
 import json
 import libsbml
+import copy
 import logging
 import io
 import tarfile
@@ -36,10 +37,10 @@ logging.basicConfig(
 ## Run a single
 #
 #
-def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartment_id):
+def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartment_id, pubchem_search):
     #open one of the rp SBML files
     rpsbml = rpSBML.rpSBML(member_name, libsbml.readSBMLFromString(rpsbml_string))
-    if rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id):
+    if rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id, pubchem_search):
         return libsbml.writeSBMLToString(rpsbml.document).encode('utf-8')
     else:
         return ''
@@ -48,7 +49,7 @@ def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartme
 ##
 #
 #
-def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
+def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3', pubchem_search=False):
     #loop through all of them and run FBA on them
     with tarfile.open(fileobj=outputTar, mode='w:gz') as tf:
         with tarfile.open(fileobj=inputTar, mode='r') as in_tf:
@@ -69,7 +70,7 @@ def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
 ## run using HDD 3X less than the above function
 #
 #
-def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3'):
+def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3', pubchem_search=False):
     with tempfile.TemporaryDirectory() as tmpOutputFolder:
         with tempfile.TemporaryDirectory() as tmpInputFolder:
             tar = tarfile.open(inputTar, mode='r')
@@ -80,6 +81,7 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
                 return False
             for sbml_path in glob.glob(tmpInputFolder+'/*'):
                 fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '').replace('.rpsbml', '')
+                logging.debug('============= '+str(fileName)+' ============')
                 rpsbml = rpSBML.rpSBML(fileName)
                 rpsbml.readSBML(sbml_path)
                 rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id)
@@ -103,33 +105,26 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
 #
 def main(inputTar,
          outputTar,
-         pathway_id,
-         compartment_id):
-    rpcofactors = rpCofactors.rpCofactors()
+         pathway_id='rp_pathway',
+         compartment_id='MNXC3',
+         pubchem_search=False):
     rpcache = rpCache.rpCache()
-
-        rpreader.deprecatedCID_cid = rpcache.getDeprecatedCID()
-        rpreader.deprecatedRID_rid = rpcache.getDeprecatedRID()
-        rpreader.cid_strc = rpcache.getCIDstrc()
-        rpreader.inchikey_cid = rpcache.getInchiKeyCID()
-        rpreader.rr_reactions = rpcache.getRRreactions()
-        rpreader.cid_xref = rpcache.getCIDxref()
-        rpreader.xref_comp, rpreader.comp_xref = rpcache.getCompXref()
-        rpreader.chebi_cid = rpcache.getChebiCID()
-        rpreader.cid_name = rpcache.getCIDname()
-
-
-    rpcofactors.deprecatedMNXM_mnxm = rpcache.deprecatedMNXM_mnxm
-    rpcofactors.deprecatedMNXR_mnxr = rpcache.deprecatedMNXR_mnxr
-    rpcofactors.mnxm_strc = rpcache.mnxm_strc
-    rpcofactors.full_reactions = rpcache.full_reactions
-    rpcofactors.chemXref = rpcache.chemXref
-    rpcofactors.rr_reactions = rpcache.rr_reactions
-    #pass the files to the rpReader
+    rpcofactors = rpCofactors.rpCofactors()
+    rpcofactors.rr_full_reactions = rpcache.getFullReactions()
+    rpcofactors.deprecatedCID_cid = rpcache.getDeprecatedCID()
+    rpcofactors.deprecatedRID_rid = rpcache.getDeprecatedRID()
+    rpcofactors.cid_strc = rpcache.getCIDstrc()
+    rpcofactors.inchikey_cid = rpcache.getInchiKeyCID()
+    rpcofactors.rr_reactions = rpcache.getRRreactions()
+    rpcofactors.cid_xref = rpcache.getCIDxref()
+    rpcofactors.xref_comp, rpcofactors.comp_xref = rpcache.getCompXref()
+    rpcofactors.chebi_cid = rpcache.getChebiCID()
+    rpcofactors.cid_name = rpcache.getCIDname()
     #outputTar_bytes = io.BytesIO()
     ######## HDD #######
     with tempfile.TemporaryDirectory() as tmpResFolder:
-        runCofactors_hdd(rpcofactors, inputTar, tmpResFolder+'/tmpRes.tar', pathway_id, compartment_id)
+        runCofactors_hdd(rpcofactors, inputTar, tmpResFolder+'/tmpRes.tar', pathway_id, compartment_id, pubchem_search)
+        #shutil.copyfile(tmpResFolder+'/tmpRes.tar', outputTar)
         #shutil.copyfile(tmpResFolder+'/tmpRes.tar', 'tmpRes.tar')
         ######## MEM #######
         #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])

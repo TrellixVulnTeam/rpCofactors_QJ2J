@@ -1,5 +1,11 @@
 input_cache/
+<<<<<<< HEAD
 OLD/
+=======
+galaxy/img/.DS_Store
+OLD/
+tool_rpUnicity.py
+>>>>>>> standalone-extrules
 cache/
 test/
 *.swp
