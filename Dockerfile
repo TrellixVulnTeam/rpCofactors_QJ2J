@@ -1,4 +1,4 @@
-FROM brsynth/rpcache
+FROM brsynth/rpcache:v1
 
 COPY rpToolCache.py /home/
 RUN python rpToolCache.py
