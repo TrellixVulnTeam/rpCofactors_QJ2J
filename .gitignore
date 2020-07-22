@@ -1,11 +1,7 @@
 input_cache/
-<<<<<<< HEAD
 OLD/
-=======
 galaxy/img/.DS_Store
-OLD/
 tool_rpUnicity.py
->>>>>>> standalone-extrules
 cache/
 test/
 *.swp
@@ -14,3 +10,4 @@ __pycache__/
 tmp/
 rpCache.py
 tool_rpUnicity.py
+*.tar
