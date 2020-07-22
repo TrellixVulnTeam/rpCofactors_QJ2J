@@ -1,4 +1,4 @@
-FROM brsynth/rpcache
+FROM brsynth/rpcache:v2
 
 #RUN wget https://raw.githubusercontent.com/Galaxy-SynBioCAD/rpUnicity/standalone/code/rpUnicity.py .
 RUN git clone https://github.com/Galaxy-SynBioCAD/rpUnicity.git -b rest-dev

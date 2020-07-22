@@ -27,7 +27,7 @@ def main(inputfile,
          compartment_id='MNXC3',
          pubchem_search='False'):
     docker_client = docker.from_env()
-    image_str = 'brsynth/rpcofactors-standalone'
+    image_str = 'brsynth/rpcofactors-standalone:v2'
     try:
         image = docker_client.images.get(image_str)
     except docker.errors.ImageNotFound:
