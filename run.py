@@ -19,10 +19,10 @@ import docker
 #
 def main(inputfile,
          input_format,
-         rxn_recipes,
-         rules_rall,
-         compounds,
          output,
+         rxn_recipes='None',
+         rules_rall='None',
+         compounds='None',
          pathway_id='rp_pathway',
          compartment_id='MNXC3',
          pubchem_search='False'):
@@ -116,10 +116,10 @@ if __name__ == "__main__":
     params = parser.parse_args()
     main(params.input,
          params.input_format,
+         params.output,
          params.rxn_recipes,
          params.rules_rall,
          params.compounds,
-         params.output,
          params.pathway_id,
          params.compartment_id,
          params.pubchem_search)
