@@ -316,8 +316,8 @@ class rpCofactors:
         #for stepNum in sorted(list(rp_path)):
             if self.addCofactors_step(rp_path[stepNum], pathway_cmp):
                 self.logger.debug('________ '+str(rp_path[stepNum]['reaction_id'])+' ___________')
-                self.logger.debug(rp_path[stepNum]['left'])
-                self.logger.debug(rp_path[stepNum]['right'])
+                self.logger.debug('left: '+str(rp_path[stepNum]['left']))
+                self.logger.debug('right: '+str(rp_path[stepNum]['right']))
                 ###add the new cofactors to the SBML
                 #remove the original species from the monocomponent reaction
                 reactants = set(set(rp_path[stepNum]['left'].keys())-set(ori_rp_path[stepNum]['left'].keys()))
