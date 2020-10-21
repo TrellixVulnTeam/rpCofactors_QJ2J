@@ -4,16 +4,12 @@ import time
 import json
 
 
-## Class to add the cofactors to a monocomponent reaction to construct the full reaction
-#
-#
 class rpCofactors:
-    ## Init method
-    # Here we want to seperate what is the use input and what is parsed by the cache to make sure that
-    # everything is not hadled by a single
-    #
-    # @param rpReader input reader object with the parsed user input and cache files required
+    """Class to add the cofactors to a monocomponent reaction to construct the full reaction
+    """
     def __init__(self):
+        """Constructor for the class
+        """
         self.logger = logging.getLogger(__name__)
         self.logger.info('Started instance of rpCofactors')
         ##### stuff to load from cache #####
@@ -33,35 +29,54 @@ class rpCofactors:
         self.pubchem_min_start = 0.0
 
 
-
     ################################################################
     ######################## PRIVATE FUNCTIONS #####################
     ################################################################
 
 
-    ## Function to create a dictionnary of old to new reaction id's
-    #
     def _checkRIDdeprecated(self, rid):
+        """Function to create a dictionnary of old to new reaction id's
+
+        :param rid: Reaction id
+
+        :type rid: str
+
+        :rtype: str
+        :return: The valid reaction id
+        """
         try:
             return self.deprecatedRID_rid[rid]
         except KeyError:
             return rid
 
-    ## Function to create return the uniform compound ID
-    #
-    # @param cid String The identifier for a given compounf
-    #
+
     def _checkCIDdeprecated(self, cid):
+        """Function to create a dictionnary of old to new species id's
+
+        :param rid: Species id
+
+        :type rid: str
+
+        :rtype: str
+        :return: The valid species id
+        """
         try:
             return self.deprecatedCID_cid[cid]
         except KeyError:
             return cid
 
 
-    ## Function that waits for the time limit of the pubchem web service if exceeded
-    #
-    #
     def _pubChemLimit(self):
+        """Function to wait until the allowed number of requests can be made to pubChem
+
+        No more than 5 requests per second.
+        No more than 400 requests per minute.
+        No longer than 300 second running time per minute.
+        Requests exceeding limits are rejected (HTTP 503 error)
+
+        :rtype: None
+        :return: None
+        """
         if self.pubchem_min_start==0.0:
             self.pubchem_min_start = time.time()
         #self.pubchem_sec_count += 1
@@ -76,16 +91,19 @@ class rpCofactors:
             self.pubchem_min_start = time.time()
             self.pubchem_min_count = 0
 
-    ## Try to retreive the xref from an inchi structure using pubchem
-    #
-    #
-    '''
-    No more than 5 requests per second.
-    No more than 400 requests per minute.
-    No longer than 300 second running time per minute.
-    Requests exceeding limits are rejected (HTTP 503 error)
-    '''
+
     def _pubchemStrctSearch(self, strct, itype='inchi'):
+        """Try to retreive the xref from an inchi structure using pubchem
+
+        :param strct: The input structure
+        :param itype: The type of input. Valid options: inchi, inchikey, smiles
+
+        :type strct: str
+        :type itype: str
+
+        :rtype: dict
+        :return: The resulting cross reference and structures
+        """
         self._pubChemLimit()
         try:
             r = requests.post('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/'+str(itype)+'/xrefs/SBURL/JSON', data={itype: strct})
@@ -166,15 +184,24 @@ class rpCofactors:
     ################################################################
 
 
-    ## Given a dictionnary describing a monocomponent reaction, add the cofactors by comparing it with the original reaction
-    #
-    # @param step Dictionnary describing the reaction
-    # @param reac_side String 'right' or 'left' describing the direction of the monocomponent reaction compared with the original reaction
-    # @param rr_reac Dictionnary describing the monocomponent reaction from RetroRules
-    # @param f_reac Dictionnary describing the full original reaction
-    # @param pathway_cmp Dictionnary used to retreive the public ID of the intermediate compounds. Resets for each individual pathway
-    #
     def completeReac(self, step, rr_reac, full_reac, mono_side, rr_string, pathway_cmp):
+        """Given a dictionnary describing a monocomponent reaction, add the cofactors by comparing it with the original reaction
+
+        :param step: Dictionnary describing the reaction
+        :param reac_side: String 'right' or 'left' describing the direction of the monocomponent reaction compared with the original reaction
+        :param rr_reac: Dictionnary describing the monocomponent reaction from RetroRules
+        :param f_reac: Dictionnary describing the full original reaction
+        :param pathway_cmp: Dictionnary used to retreive the public ID of the intermediate compounds. Resets for each individual pathway
+
+        :type step: dict
+        :type reac_side: str
+        :type rr_reac: dict
+        :type f_reac: dict
+        :type pathway_cmp: dict 
+
+        :rtype: tuple
+        :return: The tuple with the status of the function and the complete reaction string
+        """
         if mono_side:
             ## add the unknown species to pathway_cmp for the next steps
             rr_mono_cmp = list(rr_reac.keys())
@@ -227,12 +254,18 @@ class rpCofactors:
         return True, rr_string
 
 
-    ## Add the cofactors to monocomponent reactions
-    #
-    # @param step Step in a pathway
-    # @param pathway_cmp Dictionnary of intermediate compounds with their public ID's
-    # @return Boolean determine if the step is to be added
     def addCofactors_step(self, step, pathway_cmp):
+        """Add the cofactors to monocomponent reactions
+
+        :param step: Step in a pathway
+        :param pathway_cmp: Intermediate compounds with their public ID's
+
+        :type step: dict
+        :type pathway_cmp: dict 
+
+        :rtype: bool
+        :return: Success or failure of the function
+        """
         reac_smiles_left = step['reaction_rule'].split('>>')[0]
         reac_smiles_right = step['reaction_rule'].split('>>')[1]
         if self.rr_reactions[step['rule_id']][step['rule_ori_reac']]['rel_direction']==-1:
@@ -296,14 +329,24 @@ class rpCofactors:
         return True
 
 
-    ## Function to reconstruct the heterologous pathway
-    #
-    #  Read each pathway information and RetroRules information to construct heterologous pathways and add the cofactors
-    #
-    #  @param self Object pointer
-    #  @param rpsbml rpSBML object with a single model
-    #  @return Boolean if True then you keep that model for the next step, if not then ignore it
     def addCofactors(self, rpsbml, compartment_id='MNXC3', pathway_id='rp_pathway', pubchem_search=False):
+        """Function to reconstruct the heterologous pathway
+
+        Read each pathway information and RetroRules information to construct heterologous pathways and add the cofactors
+
+        :param rpsbml: The rpSBML object with a single model
+        :param compartment_id: The id of the SBML compartment of interest 
+        :param pathway_id: The Groups id of the heterologous pathway 
+        :param pubchem_search: Query the pubchem database 
+
+        :type rpsbml: rpSBML
+        :type compartment_id: str 
+        :type pathway_id: str
+        :type pubchem_search: bool 
+
+        :rtype: bool
+        :return: Success or failure of the function
+        """
         #This keeps the IDs conversions to the pathway
         pathway_cmp = {}
         rpsbml_json = rpsbml.genJSON(pathway_id)

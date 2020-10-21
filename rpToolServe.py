@@ -3,7 +3,7 @@
 Created on September 21 2019
 
 @author: Melchior du Lac
-@description: Backend rpCofactors server
+@description: Function to parse collection of rpSBML to add rpCofactors
 
 """
 
@@ -28,18 +28,33 @@ import tool_rpUnicity
 
 logging.basicConfig(
     #level=logging.DEBUG,
-    #level=logging.WARNING,
-    level=logging.ERROR,
+    level=logging.WARNING,
+    #level=logging.ERROR,
     format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
     datefmt='%d-%m-%Y %H:%M:%S',
 )
 
-#logging.getLogger().setLevel(logging.DEBUG)
 
-## Run a single
-#
-#
-def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartment_id, pubchem_search):
+def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id='rp_pathway', compartment_id='MNXC3', pubchem_search=False):
+    """Add the cofactors to a rpSBML file
+
+    :param rpcofactors: The rpCofactors object
+    :param member_name: The name of the file 
+    :param rpsbml_string: The string of the rpSBML file
+    :param pathway_id: The Groups heterologous pathway id (Default: rp_pathway)
+    :param compartment_id: The compartment SBML id (Default: MNXC3)
+    :param pubchem_search: Use the pubchem database to search for missing cross reference (Default: False)
+
+    :type rpcofactors: rpCofactors
+    :type member_name: str
+    :type rpsbml_string: str
+    :type pathway_id: str
+    :type compartment_id: str 
+    :type pubchem_search: bool
+
+    :rtype: str
+    :return: The rpSBML string
+    """
     #open one of the rp SBML files
     rpsbml = rpSBML.rpSBML(member_name, libsbml.readSBMLFromString(rpsbml_string))
     if rpcofactors.addCofactors(rpsbml, compartment_id, pathway_id, pubchem_search):
@@ -48,10 +63,26 @@ def runSingleSBML(rpcofactors, member_name, rpsbml_string, pathway_id, compartme
         return ''
 
 
-##
-#
-#
 def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3', pubchem_search=False):
+    """Add the cofactors to an archive of rpSBML files, loading the files in memory
+
+    :param rpcofactors: The rpCofactors object
+    :param inputTar: Path to the tar archive containing rpSBML files
+    :param outputTar: Path to the output tar archive
+    :param pathway_id: The Groups heterologous pathway id
+    :param compartment_id: The compartment SBML id
+    :param pubchem_search: Use the pubchem database to search for missing cross reference
+
+    :type rpcofactors: rpCofactors
+    :type inputTar: str 
+    :type outputTar: str
+    :type pathway_id: str
+    :type compartment_id: str 
+    :type pubchem_search: bool
+
+    :rtype: None
+    :return: None
+    """
     #loop through all of them and run FBA on them
     with tarfile.open(fileobj=outputTar, mode='w:gz') as tf:
         with tarfile.open(fileobj=inputTar, mode='r') as in_tf:
@@ -69,10 +100,26 @@ def runCofactors_mem(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
                         tf.addfile(tarinfo=info, fileobj=fiOut)
 
 
-## run using HDD 3X less than the above function
-#
-#
 def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', compartment_id='MNXC3', pubchem_search=False):
+    """Add the cofactors to an archive of rpSBML files, writing the results to HDD
+
+    :param rpcofactors: The rpCofactors object
+    :param inputTar: Path to the tar archive containing rpSBML files
+    :param outputTar: Path to the output tar archive
+    :param pathway_id: The Groups heterologous pathway id
+    :param compartment_id: The compartment SBML id
+    :param pubchem_search: Use the pubchem database to search for missing cross reference
+
+    :type rpcofactors: rpCofactors
+    :type inputTar: str 
+    :type outputTar: str
+    :type pathway_id: str
+    :type compartment_id: str 
+    :type pubchem_search: bool
+
+    :rtype: bool
+    :return: The success or failure of the function
+    """
     with tempfile.TemporaryDirectory() as tmpOutputFolder:
         with tempfile.TemporaryDirectory() as tmpInputFolder:
             tar = tarfile.open(inputTar, mode='r')
@@ -102,14 +149,28 @@ def runCofactors_hdd(rpcofactors, inputTar, outputTar, pathway_id='rp_pathway', 
     return True
 
 
-##
-#
-#
 def main(inputTar,
          outputTar,
          pathway_id='rp_pathway',
          compartment_id='MNXC3',
          pubchem_search=False):
+    """Load the cache to add the cofactors to an archive of rpSBML files 
+
+    :param inputTar: Path to the tar archive containing rpSBML files
+    :param outputTar: Path to the output tar archive
+    :param pathway_id: The Groups heterologous pathway id
+    :param compartment_id: The compartment SBML id
+    :param pubchem_search: Use the pubchem database to search for missing cross reference
+
+    :type inputTar: str 
+    :type outputTar: str
+    :type pathway_id: str
+    :type compartment_id: str 
+    :type pubchem_search: bool
+
+    :rtype: None
+    :return: None
+    """
     rpcache = rpCache.rpCache()
     rpcofactors = rpCofactors.rpCofactors()
     rpcofactors.rr_full_reactions = rpcache.getFullReactions()
@@ -133,9 +194,7 @@ def main(inputTar,
         ####### rpUnicity ######
         tool_rpUnicity.deduplicate(tmpResFolder+'/tmpRes.tar', outputTar)
 
-##
-#
-#
+
 def main_extrules(inputTar,
                   outputTar,
                   rxn_recipes,
@@ -144,6 +203,29 @@ def main_extrules(inputTar,
                   pathway_id='rp_pathway',
                   compartment_id='MNXC3',
                   pubchem_search=False):
+    """Load the cache to add the cofactors to an archive of rpSBML files and accept external reaction rules
+
+    :param inputTar: Path to the tar archive containing rpSBML files
+    :param outputTar: Path to the output tar archive
+    :param rxn_recipes: Path to reaction recipes
+    :param rules_rall_tsv: Path to the reaction rules
+    :param compounds_tsv: Path to the compounds file
+    :param pathway_id: The Groups heterologous pathway id
+    :param compartment_id: The compartment SBML id
+    :param pubchem_search: Use the pubchem database to search for missing cross reference
+
+    :type inputTar: str 
+    :type outputTar: str
+    :type rxn_recipes: str 
+    :type rules_rall_tsv: str
+    :type compounds_tsv: str
+    :type pathway_id: str
+    :type compartment_id: str 
+    :type pubchem_search: bool
+
+    :rtype: None
+    :return: None
+    """
     rpcache = rpCache.rpCache()
     rpcofactors = rpCofactors.rpCofactors()
     #### parse the input files and merge with cache ####
@@ -186,4 +268,3 @@ def main_extrules(inputTar,
         #runCofactors_mem(rpcofactors, inputTar, outputTar, params['pathway_id'], params['compartment_id'])
         ####### rpUnicity ######
         tool_rpUnicity.deduplicate(tmpResFolder+'/tmpRes.tar', outputTar)
-

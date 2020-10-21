@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rpCofactors’s Documentation &#8212; rpCofactors v0.2 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="rpcofactors-s-documentation">
+<h1>rpCofactors’s Documentation<a class="headerlink" href="#rpcofactors-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Welcome rpCofactors’s documentation. This tool adds cofactors to mono-component reaction rules from <a class="reference external" href="https://retrorules.org/">RetroRules</a> and must be used after <a class="reference external" href="https://github.com/Galaxy-SynBioCAD/rpReader">rpReader</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This projects relies on <a class="reference external" href="https://github.com/Galaxy-SynBioCAD/rpUnicity">rpUnicity</a> project to filter any duplicates that may occur due to differen reaction rules having the same cofactors.</p>
+</div>
+<p>To build the docker you must build a <a class="reference external" href="https://github.com/Galaxy-SynBioCAD/rpBase">rpBase</a> and <a class="reference external" href="https://github.com/Galaxy-SynBioCAD/rpCache">rpCache</a> docker, and then you can use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker build -t brsynth/rpcofactors-standalone:v2 .
+</pre></div>
+</div>
+<p>You can run the docker using the following command to parse the <a class="reference external" href="https://github.com/Galaxy-SynBioCAD/rpReader">rpReader</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python run.py -input test/test_rpReader.tar -output test/test_rpCofactors.tar -input_format tar
+</pre></div>
+</div>
+</div>
+<div class="section" id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+<dl class="py class">
+<dt id="rpTool.rpCofactors">
+<em class="property">class </em><code class="sig-prename descclassname">rpTool.</code><code class="sig-name descname">rpCofactors</code><a class="headerlink" href="#rpTool.rpCofactors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to add the cofactors to a monocomponent reaction to construct the full reaction</p>
+<dl class="py method">
+<dt id="rpTool.rpCofactors.addCofactors">
+<code class="sig-name descname">addCofactors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rpsbml</span></em>, <em class="sig-param"><span class="n">compartment_id</span><span class="o">=</span><span class="default_value">'MNXC3'</span></em>, <em class="sig-param"><span class="n">pathway_id</span><span class="o">=</span><span class="default_value">'rp_pathway'</span></em>, <em class="sig-param"><span class="n">pubchem_search</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rpTool.rpCofactors.addCofactors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to reconstruct the heterologous pathway</p>
+<p>Read each pathway information and RetroRules information to construct heterologous pathways and add the cofactors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rpsbml</strong> (<em>rpSBML</em>) – The rpSBML object with a single model</p></li>
+<li><p><strong>compartment_id</strong> (<em>str</em>) – The id of the SBML compartment of interest</p></li>
+<li><p><strong>pathway_id</strong> (<em>str</em>) – The Groups id of the heterologous pathway</p></li>
+<li><p><strong>pubchem_search</strong> (<em>bool</em>) – Query the pubchem database</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Success or failure of the function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rpTool.rpCofactors.addCofactors_step">
+<code class="sig-name descname">addCofactors_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">step</span></em>, <em class="sig-param"><span class="n">pathway_cmp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rpTool.rpCofactors.addCofactors_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the cofactors to monocomponent reactions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>dict</em>) – Step in a pathway</p></li>
+<li><p><strong>pathway_cmp</strong> (<em>dict</em>) – Intermediate compounds with their public ID’s</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Success or failure of the function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rpTool.rpCofactors.completeReac">
+<code class="sig-name descname">completeReac</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">step</span></em>, <em class="sig-param"><span class="n">rr_reac</span></em>, <em class="sig-param"><span class="n">full_reac</span></em>, <em class="sig-param"><span class="n">mono_side</span></em>, <em class="sig-param"><span class="n">rr_string</span></em>, <em class="sig-param"><span class="n">pathway_cmp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rpTool.rpCofactors.completeReac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a dictionnary describing a monocomponent reaction, add the cofactors by comparing it with the original reaction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>dict</em>) – Dictionnary describing the reaction</p></li>
+<li><p><strong>reac_side</strong> (<em>str</em>) – String ‘right’ or ‘left’ describing the direction of the monocomponent reaction compared with the original reaction</p></li>
+<li><p><strong>rr_reac</strong> (<em>dict</em>) – Dictionnary describing the monocomponent reaction from RetroRules</p></li>
+<li><p><strong>f_reac</strong> (<em>dict</em>) – Dictionnary describing the full original reaction</p></li>
+<li><p><strong>pathway_cmp</strong> (<em>dict</em>) – Dictionnary used to retreive the public ID of the intermediate compounds. Resets for each individual pathway</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The tuple with the status of the function and the complete reaction string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="rpToolServe.main">
+<em class="property">class </em><code class="sig-prename descclassname">rpToolServe.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputTar</span></em>, <em class="sig-param"><span class="n">outputTar</span></em>, <em class="sig-param"><span class="n">pathway_id</span><span class="o">=</span><span class="default_value">'rp_pathway'</span></em>, <em class="sig-param"><span class="n">compartment_id</span><span class="o">=</span><span class="default_value">'MNXC3'</span></em>, <em class="sig-param"><span class="n">pubchem_search</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rpToolServe.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the cache to add the cofactors to an archive of rpSBML files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputTar</strong> (<em>str</em>) – Path to the tar archive containing rpSBML files</p></li>
+<li><p><strong>outputTar</strong> (<em>str</em>) – Path to the output tar archive</p></li>
+<li><p><strong>pathway_id</strong> (<em>str</em>) – The Groups heterologous pathway id</p></li>
+<li><p><strong>compartment_id</strong> (<em>str</em>) – The compartment SBML id</p></li>
+<li><p><strong>pubchem_search</strong> (<em>bool</em>) – Use the pubchem database to search for missing cross reference</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="rpToolServe.main_extrules">
+<em class="property">class </em><code class="sig-prename descclassname">rpToolServe.</code><code class="sig-name descname">main_extrules</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputTar</span></em>, <em class="sig-param"><span class="n">outputTar</span></em>, <em class="sig-param"><span class="n">rxn_recipes</span></em>, <em class="sig-param"><span class="n">rules_rall_tsv</span></em>, <em class="sig-param"><span class="n">compounds_tsv</span></em>, <em class="sig-param"><span class="n">pathway_id</span><span class="o">=</span><span class="default_value">'rp_pathway'</span></em>, <em class="sig-param"><span class="n">compartment_id</span><span class="o">=</span><span class="default_value">'MNXC3'</span></em>, <em class="sig-param"><span class="n">pubchem_search</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rpToolServe.main_extrules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the cache to add the cofactors to an archive of rpSBML files and accept external reaction rules</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputTar</strong> (<em>str</em>) – Path to the tar archive containing rpSBML files</p></li>
+<li><p><strong>outputTar</strong> (<em>str</em>) – Path to the output tar archive</p></li>
+<li><p><strong>rxn_recipes</strong> (<em>str</em>) – Path to reaction recipes</p></li>
+<li><p><strong>rules_rall_tsv</strong> (<em>str</em>) – Path to the reaction rules</p></li>
+<li><p><strong>compounds_tsv</strong> (<em>str</em>) – Path to the compounds file</p></li>
+<li><p><strong>pathway_id</strong> (<em>str</em>) – The Groups heterologous pathway id</p></li>
+<li><p><strong>compartment_id</strong> (<em>str</em>) – The compartment SBML id</p></li>
+<li><p><strong>pubchem_search</strong> (<em>bool</em>) – Use the pubchem database to search for missing cross reference</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="rpToolServe.runSingleSBML">
+<em class="property">class </em><code class="sig-prename descclassname">rpToolServe.</code><code class="sig-name descname">runSingleSBML</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rpcofactors</span></em>, <em class="sig-param"><span class="n">member_name</span></em>, <em class="sig-param"><span class="n">rpsbml_string</span></em>, <em class="sig-param"><span class="n">pathway_id</span><span class="o">=</span><span class="default_value">'rp_pathway'</span></em>, <em class="sig-param"><span class="n">compartment_id</span><span class="o">=</span><span class="default_value">'MNXC3'</span></em>, <em class="sig-param"><span class="n">pubchem_search</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rpToolServe.runSingleSBML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the cofactors to a rpSBML file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rpcofactors</strong> (<a class="reference internal" href="#rpTool.rpCofactors" title="rpTool.rpCofactors"><em>rpCofactors</em></a>) – The rpCofactors object</p></li>
+<li><p><strong>member_name</strong> (<em>str</em>) – The name of the file</p></li>
+<li><p><strong>rpsbml_string</strong> (<em>str</em>) – The string of the rpSBML file</p></li>
+<li><p><strong>pathway_id</strong> (<em>str</em>) – The Groups heterologous pathway id (Default: rp_pathway)</p></li>
+<li><p><strong>compartment_id</strong> (<em>str</em>) – The compartment SBML id (Default: MNXC3)</p></li>
+<li><p><strong>pubchem_search</strong> (<em>bool</em>) – Use the pubchem database to search for missing cross reference (Default: False)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The rpSBML string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="rpToolServe.runCofactors_mem">
+<em class="property">class </em><code class="sig-prename descclassname">rpToolServe.</code><code class="sig-name descname">runCofactors_mem</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rpcofactors</span></em>, <em class="sig-param"><span class="n">inputTar</span></em>, <em class="sig-param"><span class="n">outputTar</span></em>, <em class="sig-param"><span class="n">pathway_id</span><span class="o">=</span><span class="default_value">'rp_pathway'</span></em>, <em class="sig-param"><span class="n">compartment_id</span><span class="o">=</span><span class="default_value">'MNXC3'</span></em>, <em class="sig-param"><span class="n">pubchem_search</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rpToolServe.runCofactors_mem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the cofactors to an archive of rpSBML files, loading the files in memory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rpcofactors</strong> (<a class="reference internal" href="#rpTool.rpCofactors" title="rpTool.rpCofactors"><em>rpCofactors</em></a>) – The rpCofactors object</p></li>
+<li><p><strong>inputTar</strong> (<em>str</em>) – Path to the tar archive containing rpSBML files</p></li>
+<li><p><strong>outputTar</strong> (<em>str</em>) – Path to the output tar archive</p></li>
+<li><p><strong>pathway_id</strong> (<em>str</em>) – The Groups heterologous pathway id</p></li>
+<li><p><strong>compartment_id</strong> (<em>str</em>) – The compartment SBML id</p></li>
+<li><p><strong>pubchem_search</strong> (<em>bool</em>) – Use the pubchem database to search for missing cross reference</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="rpToolServe.runCofactors_hdd">
+<em class="property">class </em><code class="sig-prename descclassname">rpToolServe.</code><code class="sig-name descname">runCofactors_hdd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rpcofactors</span></em>, <em class="sig-param"><span class="n">inputTar</span></em>, <em class="sig-param"><span class="n">outputTar</span></em>, <em class="sig-param"><span class="n">pathway_id</span><span class="o">=</span><span class="default_value">'rp_pathway'</span></em>, <em class="sig-param"><span class="n">compartment_id</span><span class="o">=</span><span class="default_value">'MNXC3'</span></em>, <em class="sig-param"><span class="n">pubchem_search</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rpToolServe.runCofactors_hdd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the cofactors to an archive of rpSBML files, writing the results to HDD</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rpcofactors</strong> (<a class="reference internal" href="#rpTool.rpCofactors" title="rpTool.rpCofactors"><em>rpCofactors</em></a>) – The rpCofactors object</p></li>
+<li><p><strong>inputTar</strong> (<em>str</em>) – Path to the tar archive containing rpSBML files</p></li>
+<li><p><strong>outputTar</strong> (<em>str</em>) – Path to the output tar archive</p></li>
+<li><p><strong>pathway_id</strong> (<em>str</em>) – The Groups heterologous pathway id</p></li>
+<li><p><strong>compartment_id</strong> (<em>str</em>) – The compartment SBML id</p></li>
+<li><p><strong>pubchem_search</strong> (<em>bool</em>) – Use the pubchem database to search for missing cross reference</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The success or failure of the function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="run.main">
+<em class="property">class </em><code class="sig-prename descclassname">run.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputfile</span></em>, <em class="sig-param"><span class="n">input_format</span></em>, <em class="sig-param"><span class="n">output</span></em>, <em class="sig-param"><span class="n">rxn_recipes</span><span class="o">=</span><span class="default_value">'None'</span></em>, <em class="sig-param"><span class="n">rules_rall</span><span class="o">=</span><span class="default_value">'None'</span></em>, <em class="sig-param"><span class="n">compounds</span><span class="o">=</span><span class="default_value">'None'</span></em>, <em class="sig-param"><span class="n">pathway_id</span><span class="o">=</span><span class="default_value">'rp_pathway'</span></em>, <em class="sig-param"><span class="n">compartment_id</span><span class="o">=</span><span class="default_value">'MNXC3'</span></em>, <em class="sig-param"><span class="n">pubchem_search</span><span class="o">=</span><span class="default_value">'False'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#run.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to call the rpCofactors docker</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputfile</strong> (<em>str</em>) – Path to the input file</p></li>
+<li><p><strong>input_format</strong> (<em>str</em>) – The input file format. Valid options: tar, sbml</p></li>
+<li><p><strong>output</strong> (<em>str</em>) – Path to the output tar archive</p></li>
+<li><p><strong>rxn_recipes</strong> (<em>str</em>) – Path to reaction recipes (Default: None)</p></li>
+<li><p><strong>rules_rall_tsv</strong> (<em>str</em>) – Path to the reaction rules (Default: None)</p></li>
+<li><p><strong>compounds_tsv</strong> (<em>str</em>) – Path to the compounds file (Default: None)</p></li>
+<li><p><strong>pathway_id</strong> (<em>str</em>) – The Groups heterologous pathway id (Default: pathway_id)</p></li>
+<li><p><strong>compartment_id</strong> (<em>str</em>) – The compartment SBML id (Default: MNXC3)</p></li>
+<li><p><strong>pubchem_search</strong> (<em>bool</em>) – Use the pubchem database to search for missing cross reference (Default: False)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">rpCofactors</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Melchior du Lac.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
